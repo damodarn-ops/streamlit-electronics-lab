@@ -113,25 +113,21 @@ st.set_page_config(layout="wide", page_title="Op-Amp Lab Simulation")
 st.title("Op-Amp Lab Simulator")
 
 # Create tabs
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Prelab", "Theory", "Simulation", "Postlab", "Feedback"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Prelab (MCQs)", "Theory", "Simulation", "Postlab", "Feedback"])
 
 with tab1:
-    st.header("Prelab Tasks")
+    st.header("Operational Amplifier Fundamentals Quiz")
     st.markdown("""
-    - **Objective:** To get familiar with the fundamental concepts of operational amplifiers (Op-Amps) and their basic configurations.
-    - **Instructions:**
-        1. Read through the "Theory" tab to understand the principles of Inverting, Non-Inverting, and Voltage Followers.
-        2. Calculate the theoretical gain and output voltage for the following scenarios. You will compare these values to the simulation results later.
-        - **Inverting Amplifier:**
-            - $R_1 = 10k\Omega$, $R_f = 100k\Omega$, $V_{in} = 1V$
-            - $R_1 = 20k\Omega$, $R_f = 50k\Omega$, $V_{in} = 2V$
-        - **Non-Inverting Amplifier:**
-            - $R_1 = 10k\Omega$, $R_f = 100k\Omega$, $V_{in} = 1V$
-            - $R_1 = 20k\Omega$, $R_f = 50k\Omega$, $V_{in} = 2V$
+    ### Objective
+    The objective of this lab is to **investigate the fundamental operational amplifier (Op-Amp) configurations**, specifically the **Inverting Amplifier**, **Non-Inverting Amplifier**, and **Voltage Follower**. Students will determine the relationship between **external resistor values ($R_1$ and $R_f$) and circuit voltage gain**, analyze the **phase relationship** between input and output signals, and observe the effect of **output voltage clipping** when the signal exceeds the supply limits.
+    """)
+
+    st.markdown("""
+    Test your knowledge on the basics of Op-Amps before starting the simulation.
     """)
     st.markdown("---")
     
- # --- MCQ Questions Section ---
+# --- MCQ Questions Section ---
     st.subheader("MCQ Questions")
 
     questions = [
@@ -145,16 +141,27 @@ with tab1:
             "question": "An inverting amplifier has R1 = 10 kΩ and Rf = 50 kΩ. What is its gain?",
             "options": ["5", "-5", "6", "-6"],
             "answer": "-5",
-            "explanation": "The gain of an inverting amplifier is given by the formula  st.latex(" -\left(\frac{R_f}{R_1}\right)")"
+            "explanation": "The gain of an inverting amplifier is given by the formula $-\\left(\\frac{R_f}{R_1}\\right)$."
         },
         {
             "question": "Which of the following amplifier configurations provides a unity gain (gain of 1)?",
             "options": ["Inverting Amplifier", "Non-Inverting Amplifier with R1=0", "Voltage Follower", "Non-Inverting Amplifier with Rf=0"],
             "answer": "Voltage Follower",
             "explanation": "A Voltage Follower is a special case of a non-inverting amplifier where the gain is exactly 1, meaning the output voltage follows the input voltage."
+        },
+        {
+            "question": "In a non-inverting amplifier, what is the phase difference between the input and output signals?",
+            "options": ["$0^\circ$", "$90^\circ$", "$180^\circ$", "Depends on frequency"],
+            "answer": "$0^\circ$",
+            "explanation": "The non-inverting amplifier configuration maintains the phase of the input signal, resulting in a $0^\circ$ phase difference."
+        },
+        {
+            "question": "What happens to the output of an Op-Amp if the required output voltage exceeds the supply voltage (e.g., $\pm 15V$)?",
+            "options": ["The output voltage increases infinitely.", "The Op-Amp is damaged.", "The output signal gets clipped.", "The output frequency changes."],
+            "answer": "The output signal gets clipped.",
+            "explanation": "The output voltage is limited by the power supply rails (saturation voltage). If the ideal output exceeds this limit, the actual output is 'clipped' at the rail voltage."
         }
     ]
-
     user_answers = {}
     for i, q in enumerate(questions):
         st.markdown(f"**Question {i+1}:** {q['question']}")
@@ -163,18 +170,32 @@ with tab1:
             q["options"],
             key=f"q{i}_options"
         )
-        st.markdown("---")
+      # st.markdown("---")
 
     if st.button("Submit Answers"):
-        st.subheader("Results")
-        for i, q in enumerate(questions):
-            st.markdown(f"**Question {i+1}:** {q['question']}")
-            if user_answers[i] == q["answer"]:
-                st.success(f"Correct! Your answer: {user_answers[i]}. The correct answer is: {q['answer']} 🎉")
-            else:
-                st.error(f"Incorrect. Your answer: {user_answers[i]}. The correct answer is: {q['answer']} ❌")
-            st.info(f"**Explanation:** {q['explanation']}")
-            st.markdown("---")
+        st.subheader("Quiz Results and Explanations")
+        
+        # Create columns for results and score
+        results_col, score_col = st.columns([3, 1])
+
+        correct_count = 0
+        total_questions = len(questions)
+        
+        with results_col:
+            for i, q in enumerate(questions):
+                is_correct = (user_answers[i] == q["answer"])
+                if is_correct:
+                    correct_count += 1
+                    st.success(f"Question {i+1}: Correct! (Answer: {q['answer']} 🎉)")
+                else:
+                    st.error(f"Question {i+1}: Incorrect. (Your answer: {user_answers[i]}. Correct answer: {q['answer']} ❌)")
+                st.info(f"**Explanation:** {q['explanation']}")
+                st.markdown("---")
+    
+        
+        with score_col:
+            st.markdown("### Your Score")
+            st.metric(label="Correct Answers", value=f"{correct_count} / {total_questions}")
 
 with tab2:
     st.subheader("Circuit Theory")
@@ -200,7 +221,7 @@ with tab3:
     st.header("Simulation")
     
     # Create columns for layout
-    col1, col2, col3 = st.columns([1, 1, 2]) # Function Generator, Amplifier, CRO Displays
+    col1, col2, col3 = st.columns([1, 1, 2]) # Function Generator, Amplifier, Diagram Display
     
     with col1:
         st.header("Function Generator")
@@ -220,22 +241,22 @@ with tab3:
         )
     
         st.write("Frequency")
-        freq_col1, freq_col2 = st.columns([2, 1])
+        # Ensure frequency unit is defined before being used by get_actual_frequency
+        freq_unit = st.radio(
+            "Unit",
+            ("Hz", "kHz", "MHz"),
+            index=0, # Default to Hz
+            horizontal=True,
+            label_visibility="collapsed", # Hide default label
+            key="freq_unit_radio"
+        )
+        freq_col1, _ = st.columns([2, 1])
         with freq_col1:
             frequency_value = st.slider(
                 "Frequency Value",
                 min_value=0.0, max_value=1100.0, value=100.0, step=0.1,
                 label_visibility="collapsed", # Hide default label to combine with units
                 key="frequency_slider"
-            )
-     #   with freq_col2:
-            freq_unit = st.radio(
-                "Unit",
-                ("Hz", "kHz", "MHz"),
-                index=0, # Default to Hz
-                horizontal=True,
-                label_visibility="collapsed", # Hide default label
-                key="freq_unit_radio"
             )
         
         actual_frequency = get_actual_frequency(frequency_value, freq_unit)
@@ -291,7 +312,7 @@ with tab3:
     # Use fixed values for Voltage Follower to ensure correct calculation
     if amplifier_type == "Voltage Follower":
         r1_kohm_calc = float('inf')  # Represents R1 as an open circuit
-        rf_kohm_calc = 0.0          # Represents Rf as a short circuit
+        rf_kohm_calc = 0.0           # Represents Rf as a short circuit
     else:
         r1_kohm_calc = r1_kohm
         rf_kohm_calc = rf_kohm
@@ -304,9 +325,6 @@ with tab3:
     with col3:
         st.header(" Circuit Diagram")
         
-        # --- Code to display the circuit diagram is now here ---
-      
-        
         if amplifier_type == "Inverting Amplifier":
             st.image("images/invertingamplifier.png", caption="Inverting Amplifier Circuit", use_container_width=True)
         elif amplifier_type == "Non-Inverting Amplifier":
@@ -315,36 +333,44 @@ with tab3:
             st.image("images/voltagefollower.png", caption="Buffer Amplifier (Voltage Follower) Circuit", use_container_width=True)
         else:
             st.info("Select an amplifier type to display its circuit diagram.")
-    
-        
-        st.markdown("---")
-        st.subheader("CRO Waveforms")
-        
-        
         
     
+    st.markdown("---")
+    st.subheader("CRO Waveforms")
+    
+    # ------------------------------------------------------------------
+    # --- PLOTS IN FULL-WIDTH ROW ---
+    # ------------------------------------------------------------------
 
-        # New layout for combined and output plots
+    # Create three columns *outside* the col1/col2/col3 definition to span the full width
+    plot_col1, plot_col2, plot_col3 = st.columns(3) 
 
- # Plot 1: Input Signal (Top Plot)
-    fig1, ax1 = plt.subplots(figsize=(6, 3))
+    # Determine plot dimensions
+    plot_width = 4.5 # Adjusted width for full-space visibility
+    plot_height = 3.0
+    
+    # Plot 1: Input Signal
+    fig1, ax1 = plt.subplots(figsize=(plot_width, plot_height)) 
     ax1.plot(t, y_input, color='lime')
     ax1.set_facecolor("black")
     ax1.axhline(0, color='gray', linewidth=0.5)
     ax1.axvline(0, color='gray', linewidth=0.5)
-    ax1.set_ylim(-amplitude * 1.5 if amplitude > 0 else -1, amplitude * 1.5 if amplitude > 0 else 1)
+    plot1_ylim = amplitude * 1.5 if amplitude > 0 else 1.0
+    ax1.set_ylim(-plot1_ylim, plot1_ylim) 
     ax1.set_xlim(0, total_duration)
     ax1.tick_params(axis='x', colors='white')
     ax1.tick_params(axis='y', colors='white')
-    ax1.set_title("Input Waveform", color='black') # Changed title
+    ax1.set_title("Input Waveform (Ch 1)", color='white')
     if amplitude != 0:
         ax1.text(0.02, 0.95, f'Amplitude: {amplitude:.2f} V', transform=ax1.transAxes, 
-                 fontsize=10, color='white', verticalalignment='top')
-    st.pyplot(fig1)
+                  fontsize=9, color='white', verticalalignment='top')
+    
+    with plot_col1: # Display fig1 in the first plot column
+        st.pyplot(fig1)
     plt.close(fig1)
 
-    # Plot 2: Output Signal (Right-hand side)
-    fig2, ax2 = plt.subplots(figsize=(6, 3))
+    # Plot 2: Output Signal
+    fig2, ax2 = plt.subplots(figsize=(plot_width, plot_height)) 
     ax2.plot(t, y_output, color='cyan')
     ax2.set_facecolor("black")
     ax2.axhline(0, color='gray', linewidth=0.5)
@@ -354,7 +380,7 @@ with tab3:
     ax2.set_xlim(0, total_duration)
     ax2.tick_params(axis='x', colors='white')
     ax2.tick_params(axis='y', colors='white')
-    ax2.set_title("Output Waveform", color='black') # Changed title
+    ax2.set_title("Output Waveform (Ch 2)", color='white')
 
     amplitude_display_text = f'Amplitude: {output_amplitude:.2f} V'
     if abs(output_amplitude - CLIPPING_LIMIT) < 0.01 and amplitude > 0:
@@ -363,29 +389,35 @@ with tab3:
         amplitude_display_text += ' (No Output)'
 
     ax2.text(0.02, 0.95, amplitude_display_text, transform=ax2.transAxes,
-             fontsize=10, color='white', verticalalignment='top')
-    st.pyplot(fig2)
+              fontsize=9, color='white', verticalalignment='top')
+    
+    with plot_col2: # Display fig2 in the second plot column
+        st.pyplot(fig2)
     plt.close(fig2)
 
-
-    fig_combined, ax_combined = plt.subplots(figsize=(6, 3))
+    # Plot 3: Combined Waveform
+    fig_combined, ax_combined = plt.subplots(figsize=(plot_width, plot_height)) 
     ax_combined.plot(t, y_input, color='lime', label='Input (Ch 1)')
     ax_combined.plot(t, y_output, color='cyan', label='Output (Ch 2)')
     ax_combined.set_facecolor("black")
     ax_combined.axhline(0, color='gray', linewidth=0.5)
     ax_combined.axvline(0, color='gray', linewidth=0.5)
-    max_combined_amp = max(amplitude * 1.5, output_amplitude * 1.2, 1.0)
+    max_combined_amp = max(plot1_ylim, plot_ylim)
     ax_combined.set_ylim(-max_combined_amp, max_combined_amp)
     ax_combined.set_xlim(0, total_duration)
     ax_combined.tick_params(axis='x', colors='white')
     ax_combined.tick_params(axis='y', colors='white')
-    ax_combined.set_title("Combined Waveform", color='black') # Changed title
-    ax_combined.legend(loc='upper right', facecolor='darkgray', edgecolor='white')
-    st.pyplot(fig_combined)
-    plt.close(fig_combined)
-
-        
+    ax_combined.set_title("Combined Waveform", color='white')
+    ax_combined.legend(loc='upper right', facecolor='darkgray', edgecolor='white', fontsize=8)
     
+    with plot_col3: # Display fig_combined in the third plot column
+        st.pyplot(fig_combined)
+    plt.close(fig_combined)
+    
+    # ------------------------------------------------------------------
+    # --- END PLOTS IN FULL-WIDTH ROW ---
+    # ------------------------------------------------------------------
+
     # --- Simulation Results Table ---
     st.markdown("---") # Horizontal line for separation
     st.header("Simulation Results")
@@ -393,11 +425,18 @@ with tab3:
     # Button to log current simulation
     if st.button("Log Current Simulation"):
         st.session_state.row_id_counter += 1
+        # Handle N/A display for Voltage Follower
+        r1_display = "N/A"
+        rf_display = "N/A"
+        if amplifier_type != "Voltage Follower":
+             r1_display = f"{r1_kohm:.1f}"
+             rf_display = f"{rf_kohm:.1f}"
+
         new_entry = {
             "#": st.session_state.row_id_counter,
             "Amplifier Type": get_amplifier_name(amplifier_type),
-            "R1 (kΩ)": "N/A" if disable_inputs else f"{r1_kohm:.1f}",
-            "Rf (kΩ)": "N/A" if disable_inputs else f"{rf_kohm:.1f}",
+            "R1 (kΩ)": r1_display,
+            "Rf (kΩ)": rf_display,
             "Input Amp (V)": f"{amp_input:.2f}",
             "Input Freq (Hz)": f"{input_freq:.1f}",
             "Output Amp (V)": f"{output_amplitude:.2f}",
@@ -427,6 +466,10 @@ with tab4:
     3. What is the primary purpose of a Voltage Follower, and how do your simulation results for the Voltage Follower demonstrate this?
     4. What happens to the output waveform when the gain is too high for a given input amplitude? How does the "Clipped" message in the simulation confirm this?
     """)
+    st.text_area("Your Answer for Q1", height=100, key="prelab_q1")
+    st.text_area("Your Answer for Q2", height=100, key="prelab_q2")
+    st.text_area("Your Answer for Q3", height=100, key="prelab_q3")
+    st.text_area("Your Answer for Q4", height=100, key="prelab_q4")
     
 with tab5:
     st.header("Feedback")
@@ -434,9 +477,8 @@ with tab5:
     Your feedback is valuable to us! Please provide your comments on the simulator.
     """)
     st.write("We would love to hear your thoughts on this simulator.")
-    st.text_input("Your Name and Registration number")
-    st.slider("How would you rate this simulator?", 1, 5)
+    st.text_input("Your Name")
+    st.text_input("Registration number/Faculty ID")
+    st.slider("How would you rate this simulator?(best -5)", 1, 5)
     st.text_area("Your comments...")
     st.button("Submit Feedback")
-
-   
