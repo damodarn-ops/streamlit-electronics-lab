@@ -18,6 +18,68 @@ st.title("Schmitt Trigger Simulator")
 # Create the tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Prelab", "Theory", "Simulation", "Postlab", "Feedback"])
 
+mcq_questions = [
+    {
+        "question": "What is the defining characteristic that differentiates an op-amp configured as a Schmitt Trigger from a simple op-amp comparator?",
+        "options": [
+"The Schmitt Trigger uses a differential input, while the comparator uses a single-ended input.",
+"The Schmitt Trigger uses positive feedback, which results in the property of hysteresis.",
+"The Schmitt Trigger has a much higher output slew rate than a simple comparator.",
+"The Schmitt Trigger uses negative feedback to keep the op-amp in its linear region."
+  ],
+
+        "correct_option_index": 1,
+        "explanation": "The defining feature of a Schmitt Trigger is the use of positive feedback to create two distinct switching thresholds."
+    },
+    {
+   "question":"In the context of a Schmitt Trigger, what is the most significant benefit of the **hysteresis** property?",
+"options": [
+"It decreases the circuit's overall power consumption.",
+"It allows the circuit to amplify the input signal without distortion.",
+"It filters out high-frequency noise and AC components from the input signal.",
+"It prevents spurious output switching (chattering) caused by noise near the threshold voltage."
+],
+ "correct_option_index": 3,
+ "explanation":"Hysteresis provides noise immunity by requiring the input signal to cross a *higher* threshold to switch one way and a *lower* threshold to switch back."
+ },
+    {
+     
+    "question": "The **Upper Threshold Point ($\mathbf{V_{UTP}}$)** is the input voltage level that causes the output of the Schmitt Trigger to switch from:",
+"options": [
+"The ground voltage to $+\mathbf{V_{sat}}$",
+"$-\mathbf{V_{sat}}$ to $+\mathbf{V_{sat}}$",
+"$+\mathbf{V_{sat}}$ to $-\mathbf{V_{sat}}$",
+"$-\mathbf{V_{sat}}$ to $\mathbf{V_{UTP}}$"
+],
+"correct_option_index": 2,
+"explanation": "When the input exceeds the $\mathbf{V_{UTP}}$, the high output ($+\mathbf{V_{sat}}$) is pulled low to ($-\mathbf{V_{sat}}$)."
+},
+{
+ "question": "The width of the hysteresis loop in a Schmitt Trigger is defined by the difference between which two parameters?",
+"options": [
+"The input voltage range and the output voltage range.",
+"The positive and negative saturation voltages ($\mathbf{V_{sat}} - (-\mathbf{V_{sat}})$).",
+"The Upper Threshold Point and the Lower Threshold Point ($\mathbf{V_{UTP}} - \mathbf{V_{LTP}}$).",
+"The input peak voltage and the $\mathbf{V_{UTP}}$ only."
+],
+"correct_option_index":2,
+"explanation": "The difference between the two switching points ($\mathbf{V_{UTP}}$ and $\mathbf{V_{LTP}}$) defines the width of the hysteresis loop on the input axis."
+},
+{
+"question": "For an **Inverting Schmitt Trigger** with feedback resistor $R_2$ and $R_1$ to ground, if the output saturation voltages are $\pm \mathbf{V_{sat}}$, the expression for $\mathbf{V_{UTP}}$ is:",
+"options": [
+"$\mathbf{V_{sat}} \left( \\frac{R_2}{R_1} \\right)$",
+"$\mathbf{V_{sat}} \left( 1 + \\frac{R_2}{R_1} \\right)$",
+"$\mathbf{V_{sat}} \left( \\frac{R_1}{R_1 + R_2} \\right)$",
+"$\mathbf{V_{sat}} \left( \\frac{R_1}{R_2} \\right)$"
+],
+"correct_option_index": 3,
+"explanation": "The general formula for $\mathbf{V_{UTP}}$ is $\mathbf{V_{sat}} \cdot \mathbf{R_1}/ \mathbf{R_2}$ for the inverting configuration. The exact formula is $\mathbf{V_{UTP}} = \mathbf{V_{sat}} \cdot \mathbf{R_1} / \mathbf{R_2}$."
+}
+
+    ]
+
+
 # --- Prelab Tab ---
 with tab1:
     st.header("Prelab")
@@ -29,13 +91,33 @@ with tab1:
     2.  Understanding of positive feedback in op-amp circuits.
     3.  Familiarity with hysteresis and its application in electronics.
 
-    **Questions:**
-    1.  What is a Schmitt Trigger and how does it differ from a simple comparator?
-    2.  Explain the concept of **hysteresis** in a circuit. Why is it useful?
-    3.  Define the **Upper Threshold Point (V_UTP)** and the **Lower Threshold Point (V_LTP)**.
-    4.  Draw the circuit diagram for a non-inverting Schmitt Trigger and derive the equations for V_UTP and V_LTP.
-    5.  Predict the output waveform for a given input signal and specific R1 and R2 values.
+   
     """)
+    st.subheader("Multiple Choice Questions (MCQ)")
+    st.text_input("Your Name",key="p1")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions):
+       user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+
+    if st.button("Submit Answers", key="submit_mcq"):
+       st.subheader("Results")
+       all_correct = True
+       for i, mcq in enumerate(mcq_questions):
+           correct_answer = mcq["options"][mcq["correct_option_index"]]
+           if user_answers[i] == correct_answer:
+               st.success(f"**Question {i+1}: Correct!** ✅")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+           else:
+               st.error(f"**Question {i+1}: Incorrect.** ❌")
+               st.markdown(f"**Correct Answer:** {correct_answer}")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               all_correct = False
+       
+       if all_correct:
+           st.balloons()
+           st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
+       else:
+           st.warning("Please review the theory and try again. 🤔")
 
 # --- Theory Tab ---
 import streamlit as st
@@ -63,7 +145,7 @@ with tab2:
     In a non-inverting Schmitt Trigger, the input signal is applied to the non-inverting (+) terminal, and the positive feedback loop is created by connecting a resistor (**R1**) from the output to the non-inverting input, and another resistor (**R2**) from the non-inverting input to ground.
 
     """)
-    st.image("images/schmitttrigger.png", caption="Schmitt Trigger Circuit", use_container_width=True)
+    st.image("images/schmitttrigger.png", caption="Schmitt Trigger Circuit", width='stretch')
     st.markdown(r"""
 
     The threshold voltages are determined by the resistance values (R1 and R2) and the op-amp's saturation voltages ($V_{sat+}$ and $V_{sat-}$):
@@ -140,7 +222,7 @@ with tab3:
         R2_val_kohm = st.number_input(
             "Resistance (R2) (kΩ)",
             min_value=0.1, # R2 cannot be zero
-            value=100.0,
+            value=0.5,
             step=0.1,
             format="%.1f",
             key="R2_input_schmitt"
@@ -248,85 +330,90 @@ with tab3:
     with col3:
         st.header(" Circuit Diagram")
         
-        st.image("images/schmitttrigger.png", caption="Schmitt Trigger Circuit", use_container_width=True)   
+        st.image("images/schmitttrigger.png", caption="Schmitt Trigger Circuit", width='stretch')   
         
-        st.subheader("CRO Displays")
+    st.header("CRO Displays")
+    st.text_input("Your Name",key="p2")
+    plot_col1, plot_col2, plot_col3 = st.columns(3) 
 
         # Perform the simulation based on current widget values.
-        y_input, y_output, t, amp_input, total_duration, input_freq, \
+    y_input, y_output, t, amp_input, total_duration, input_freq, \
         V_UTP, V_LTP, V_sat_plus, V_sat_minus, R1_val_kohm, R2_val_kohm = simulate_schmitt_trigger(
             amplitude, actual_frequency, selected_wave_type_int,
             R1_val_kohm, R2_val_kohm
         )
 
         # Plotting for CRO Channel 1 (Input Signal).
-        fig1, ax1 = plt.subplots(figsize=(3, 2), dpi=100)
-        ax1.plot(t, y_input, color='lime')
-        ax1.set_facecolor("black")
-        ax1.axhline(0, color='gray', linewidth=0.5)
-        ax1.axvline(0, color='gray', linewidth=0.5)
+    fig1, ax1 = plt.subplots(figsize=(3, 2), dpi=100)
+    ax1.plot(t, y_input, color='lime')
+    ax1.set_facecolor("black")
+    ax1.axhline(0, color='gray', linewidth=0.5)
+    ax1.axvline(0, color='gray', linewidth=0.5)
         
         # Plot UTP and LTP lines on input graph for better visualization.
-        ax1.axhline(V_UTP, color='red', linestyle='--', linewidth=1, label=f'V_UTP={V_UTP:.2f}V')
-        ax1.axhline(V_LTP, color='blue', linestyle='--', linewidth=1, label=f'V_LTP={V_LTP:.2f}V')
-        ax1.legend(loc='lower left', fontsize=7, facecolor='darkgray', edgecolor='white')
+    ax1.axhline(V_UTP, color='red', linestyle='--', linewidth=1, label=f'V_UTP={V_UTP:.2f}V')
+    ax1.axhline(V_LTP, color='blue', linestyle='--', linewidth=1, label=f'V_LTP={V_LTP:.2f}V')
+    ax1.legend(loc='lower left', fontsize=7, facecolor='darkgray', edgecolor='white')
 
         # Adjust Y-axis limits to include input amplitude, UTP, and LTP, with padding.
-        max_plot_amp = max(amp_input * 1.5, abs(V_UTP) * 1.2, abs(V_LTP) * 1.2)
-        if max_plot_amp == 0: max_plot_amp = 1 # Ensure a minimum range if all values are 0.
-        ax1.set_ylim(-max_plot_amp, max_plot_amp)
+    max_plot_amp = max(amp_input * 1.5, abs(V_UTP) * 1.2, abs(V_LTP) * 1.2)
+    if max_plot_amp == 0: max_plot_amp = 1 # Ensure a minimum range if all values are 0.
+    ax1.set_ylim(-max_plot_amp, max_plot_amp)
         
-        ax1.set_xlim(0, total_duration)
-        ax1.tick_params(axis='x', colors='white')
-        ax1.tick_params(axis='y', colors='white')
-        ax1.set_title("Ch 1: Input Signal", color='white', fontsize=10)
-        ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
+    ax1.set_xlim(0, total_duration)
+    ax1.tick_params(axis='x', colors='white')
+    ax1.tick_params(axis='y', colors='white')
+    ax1.set_title("Ch 1: Input Signal", color='white', fontsize=10)
+    ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
-        st.pyplot(fig1) # Display the Matplotlib figure in Streamlit.
+    with plot_col1:
+                  st.pyplot(fig1) # Display the Matplotlib figure in Streamlit.
 
         # Plotting for CRO Channel 2 (Output Signal).
-        fig2, ax2 = plt.subplots(figsize=(3, 2), dpi=100)
-        ax2.plot(t, y_output, color='cyan')
-        ax2.set_facecolor("black")
-        ax2.axhline(0, color='gray', linewidth=0.5)
-        ax2.axvline(0, color='gray', linewidth=0.5)
+    fig2, ax2 = plt.subplots(figsize=(3, 2), dpi=100)
+    ax2.plot(t, y_output, color='cyan')
+    ax2.set_facecolor("black")
+    ax2.axhline(0, color='gray', linewidth=0.5)
+    ax2.axvline(0, color='gray', linewidth=0.5)
         
         # Set Y-axis limits based on saturation voltages with padding.
-        ax2.set_ylim(V_sat_minus * 1.2, V_sat_plus * 1.2)
+    ax2.set_ylim(V_sat_minus * 1.2, V_sat_plus * 1.2)
         
-        ax2.set_xlim(0, total_duration)
-        ax2.tick_params(axis='x', colors='white')
-        ax2.tick_params(axis='y', colors='white')
-        ax2.set_title("Ch 2: Output Signal", color='white', fontsize=10)
-        ax2.text(0.02, 0.95, f'Output High: {V_sat_plus:.2f} V', transform=ax2.transAxes,
+    ax2.set_xlim(0, total_duration)
+    ax2.tick_params(axis='x', colors='white')
+    ax2.tick_params(axis='y', colors='white')
+    ax2.set_title("Ch 2: Output Signal", color='white', fontsize=10)
+    ax2.text(0.02, 0.95, f'Output High: {V_sat_plus:.2f} V', transform=ax2.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
-        ax2.text(0.02, 0.85, f'Output Low: {V_sat_minus:.2f} V', transform=ax2.transAxes,
+    ax2.text(0.02, 0.85, f'Output Low: {V_sat_minus:.2f} V', transform=ax2.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
+    with plot_col2:
         st.pyplot(fig2) # Display the Matplotlib figure in Streamlit.
 
         # Plotting for Combined View (Channel 1 & 2).
-        fig_combined, ax_combined = plt.subplots(figsize=(6, 3), dpi=100)
-        ax_combined.plot(t, y_input, color='lime', label='Input (Ch 1)')
-        ax_combined.plot(t, y_output, color='cyan', label='Output (Ch 2)')
-        ax_combined.set_facecolor("black")
-        ax_combined.axhline(0, color='gray', linewidth=0.5)
-        ax_combined.axvline(0, color='gray', linewidth=0.5)
+    fig_combined, ax_combined = plt.subplots(figsize=(6, 3), dpi=100)
+    ax_combined.plot(t, y_input, color='lime', label='Input (Ch 1)')
+    ax_combined.plot(t, y_output, color='cyan', label='Output (Ch 2)')
+    ax_combined.set_facecolor("black")
+    ax_combined.axhline(0, color='gray', linewidth=0.5)
+    ax_combined.axvline(0, color='gray', linewidth=0.5)
         
         # Plot UTP and LTP lines on combined graph.
-        ax_combined.axhline(V_UTP, color='red', linestyle='--', linewidth=1, label=f'V_UTP ({V_UTP:.2f}V)')
-        ax_combined.axhline(V_LTP, color='blue', linestyle='--', linewidth=1, label=f'V_LTP ({V_LTP:.2f}V)')
+    ax_combined.axhline(V_UTP, color='red', linestyle='--', linewidth=1, label=f'V_UTP ({V_UTP:.2f}V)')
+    ax_combined.axhline(V_LTP, color='blue', linestyle='--', linewidth=1, label=f'V_LTP ({V_LTP:.2f}V)')
 
         # Determine combined Y-axis limit.
-        max_combined_amp = max(amp_input * 1.5, abs(V_UTP) * 1.2, abs(V_LTP) * 1.2, V_sat_plus * 1.2)
-        if max_combined_amp == 0: max_combined_amp = 1
-        ax_combined.set_ylim(-max_combined_amp, max_combined_amp)
+    max_combined_amp = max(amp_input * 1.5, abs(V_UTP) * 1.2, abs(V_LTP) * 1.2, V_sat_plus * 1.2)
+    if max_combined_amp == 0: max_combined_amp = 1
+    ax_combined.set_ylim(-max_combined_amp, max_combined_amp)
         
-        ax_combined.set_xlim(0, total_duration)
-        ax_combined.tick_params(axis='x', colors='white')
-        ax_combined.tick_params(axis='y', colors='white')
-        ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='white', fontsize=10)
-        ax_combined.legend(loc='upper right', fontsize=8, facecolor='darkgray', edgecolor='white')
-        st.pyplot(fig_combined) # Display the Matplotlib figure in Streamlit.
+    ax_combined.set_xlim(0, total_duration)
+    ax_combined.tick_params(axis='x', colors='white')
+    ax_combined.tick_params(axis='y', colors='white')
+    ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='white', fontsize=10)
+    ax_combined.legend(loc='upper right', fontsize=8, facecolor='darkgray', edgecolor='white')
+    with plot_col3:    
+           st.pyplot(fig_combined) # Display the Matplotlib figure in Streamlit.
 
     # --- Dynamic Parameters Table ---
     st.header("Simulation Results")
@@ -349,7 +436,7 @@ with tab3:
     # Display the history as a Pandas DataFrame.
     if st.session_state.simulation_history_schmitt:
         df_history = pd.DataFrame(st.session_state.simulation_history_schmitt)
-        st.dataframe(df_history, use_container_width=True) # use_container_width makes the table responsive.
+        st.dataframe(df_history, width='stretch') # use_container_width makes the table responsive.
 
     # Button to clear the table history.
     if st.button("Clear Table History", key="clear_table_button_schmitt"):
@@ -359,27 +446,40 @@ with tab3:
 # --- Postlab Tab ---
 with tab4:
     st.header("Postlab")
-    st.markdown("""
-    **Conclusion:**
-    * Summarize your observations from the simulation, specifically on the relationship between R1, R2, and the threshold voltages.
-    * Explain how the hysteresis loop is visible in the combined input-output graph.
-    * Discuss the effect of varying the amplitude of the input signal relative to the hysteresis width.
+    st.text_input("Your Name",key="p3")
+    st.subheader("Conclusion:")
+       
+    st.write("Summarize your observations from the simulation, specifically on the relationship between R1, R2, and the threshold voltages.")
+    st.text_area("Your Answer ", height=100, key="postlab_q1")
+    st.write("Explain how the hysteresis loop is visible in the combined input-output graph.")
+    st.text_area("Your Answer ", height=100, key="postlab_q2")
+    st.write(" Discuss the effect of varying the amplitude of the input signal relative to the hysteresis width.")
+    st.text_area("Your Answer ", height=100, key="postlab_q3")
 
-    **Analysis:**
-    * If R1 = 10 kΩ and R2 = 1 kΩ, calculate the V_UTP and V_LTP values and verify them with the simulation.
-    * What happens to the output if the input signal's peak-to-peak voltage is less than the hysteresis width?
-    * How does the Schmitt Trigger circuit solve the problem of false triggering due to noise in a simple comparator circuit?
-    """)
+    st.subheader("Analysis:")
+    st.write("If R1 = 10 kΩ and R2 = 1 kΩ, calculate the V_UTP and V_LTP values and verify them with the simulation.")
+    st.text_area("Your Answer ", height=100, key="postlab_q4")
+    st.write("What happens to the output if the input signal's peak-to-peak voltage is less than the hysteresis width?")
+    st.text_area("Your Answer ", height=100, key="postlab_q5")
+    st.write("How does the Schmitt Trigger circuit solve the problem of false triggering due to noise in a simple comparator circuit?")
+    st.text_area("Your Answer ", height=100, key="postlab_q6")
+    
 
 # --- Feedback Tab ---
 with tab5:
-    st.header("Feedback")
-    st.markdown("""
-    We value your feedback to improve this simulator. Please let us know your thoughts.
-
-    **Instructions:**
-    1.  What did you find most useful about this simulator?
-    2.  Were there any features that were confusing or difficult to use?
-    3.  What new features would you like to see added in the future?
-    4.  Any other comments or suggestions.
-    """)
+    
+   st.header("Feedback")
+   st.markdown("""
+   We value your feedback to improve this simulator. Please let us know your thoughts.
+   """)
+   st.text_input("Your Name")
+   st.text_input("Registration number/Faculty ID")
+   st.slider("How would you rate this simulator?(best -5)", 1, 5)
+  
+   st.text_input("1.  What did you find most useful about this simulator?")
+   st.text_input("2.  Were there any features that were confusing or difficult to use?")
+   st.text_input("3.  What new features would you like to see added in the future?")
+  
+   st.text_area("Any other comments or suggestions.", height=200, key="feedback_text")
+   if st.button("Submit Feedback"):
+     st.success("Thank you for your feedback!")

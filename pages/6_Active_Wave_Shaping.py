@@ -18,6 +18,64 @@ st.title("Active Wave Shaping Circuit Simulator")
 # Create the tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Prelab", "Theory", "Simulation", "Postlab", "Feedback"])
 
+mcq_questions = [
+    {
+        "question":("What is the main advantage of an **active clipper circuit** (using an op-amp) over a passive clipper (diode and resistor)?"),
+        "options": [
+            " It operates only with low-frequency signals.",
+"It provides a near-ideal clipping action with almost no voltage drop (i.e., minimal effect from the diode's $0.7 {V}$ drop).",
+" It completely eliminates the need for a DC reference voltage.",
+" It significantly increases the peak amplitude of the output signal."
+],
+        "correct_option_index": 1,
+        "explanation": " The op-amp is configured to operate as a **precision rectifier/limiter**. Due to the op-amp's extremely high open-loop gain, the diode's forward voltage drop is effectively eliminated from the output equation. This allows the signal to be clipped very precisely at the **reference voltage ($V_{{ref}}$**, making the diode behave almost ideally."
+    },
+    {
+     "question":("In an active clamper circuit, which component is fundamentally responsible for introducing the DC level shift to the AC signal?"),
+      "options": [
+            "The operational amplifier (op-amp).",
+  " The diode, by determining the peak-to-peak voltage.",
+  " The capacitor, by charging to the peak value of the input signal.",
+  "The current-limiting resistor."
+          ],
+     "correct_option_index": 2,
+     "explanation":"The **capacitor** is the energy storage element. During one half-cycle, the diode is forward-biased, allowing the capacitor to charge to the peak input voltage (minus the clamping reference, if any). Since the capacitor is in series, this stored DC voltage is then added to (or subtracted from) the input AC signal, shifting the entire waveform up or down."
+     },
+    {
+     "question":("An active positive clipper circuit has a sine wave input with a peak of $10\text{V}$ and a reference voltage $V_{\text{ref}} = 4\text{V}$. What is the maximum positive voltage of the clipped output waveform?"),
+     "options": [
+            " $0.7 {V}$",
+   " $10 {V}$",
+   " $4 {V}$",
+   " $6 {V}$"
+         ],
+     "correct_option_index": 2,
+     "explanation":" A **positive clipper** limits or 'clips' the positive voltage peaks. In an active circuit, the output voltage is precisely limited by the $V_{ {ref}}$ source when the input exceeds $V_{{ref}}$. Therefore, all positive input voltage portions above $4 {V}$ are removed, leaving a maximum positive output of $4 {V}$. The negative portion remains unaffected."
+     },
+     {
+      "question":("For a clamper circuit to function correctly as a **DC restorer**, the $RC$ time constant ($\tau$) of the circuit should be:"),
+      "options": [
+            " Very small compared to the input signal period ($T$).",
+  " Roughly equal to the input signal period ($T$).",
+  " Very large (typically $\tau \ge 5T$) to ensure the capacitor holds its charge.",
+  "Exactly half of the input signal period ($T$)."
+  ],
+"correct_option_index": 2,
+"explanation":"The clamper's capacitor charges quickly when the diode is ON, but it must **discharge very slowly** when the diode is OFF to maintain the DC shift. If the time constant ($\tau = RC$) is large compared to the signal period ($T$), the capacitor voltage remains relatively constant, ensuring the entire waveform is shifted without significant decay."
+        },
+     {
+      "question":("In the context of wave-shaping, the primary function of a **clipper** is to **limit the amplitude** of the waveform, while a **clamper**'s primary function is to:"),
+      "options": [
+            " Amplify the signal without distortion.",
+  " Shift the DC level of the entire waveform.",
+  "Convert the AC signal into a pure DC signal.",
+  " Introduce a fixed frequency shift."
+    ],
+    "correct_option_index": 1,
+    "explanation": "A **clipper** *removes* a portion of the signal above or below a certain level, **changing the shape** but not the DC level. A **clamper** *adds* a DC voltage to the signal, effectively **shifting the entire waveform** up or down without changing its peak-to-peak amplitude or shape. This is why clampers are also called DC restorers."  
+      }
+    ]
+
 # --- Prelab Tab ---
 with tab1:
     st.header("Prelab")
@@ -29,13 +87,32 @@ with tab1:
     2.  Understanding of diodes and their ideal behavior.
     3.  Familiarity with capacitors and their role in DC level shifting.
 
-    **Questions:**
-    1.  What is the primary difference between a clipper and a clamper circuit?
-    2.  Explain the function of a reference voltage (V_ref) in these circuits.
-    3.  How does an active circuit (with an op-amp) differ from a passive circuit (with only diodes and resistors)?
-    4.  Draw a circuit diagram for a positive clamper and a negative clipper.
-    5.  Predict the output waveform for a sine wave input for a positive clipper with a V_ref of 2V.
     """)
+    st.subheader("Multiple Choice Questions (MCQ)")
+    st.text_input("Your Name",key="p1")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions):
+       user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+
+    if st.button("Submit Answers", key="submit_mcq"):
+       st.subheader("Results")
+       all_correct = True
+       for i, mcq in enumerate(mcq_questions):
+           correct_answer = mcq["options"][mcq["correct_option_index"]]
+           if user_answers[i] == correct_answer:
+               st.success(f"**Question {i+1}: Correct!** ✅")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+           else:
+               st.error(f"**Question {i+1}: Incorrect.** ❌")
+               st.markdown(f"**Correct Answer:** {correct_answer}")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               all_correct = False
+       
+       if all_correct:
+           st.balloons()
+           st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
+       else:
+           st.warning("Please review the theory and try again. 🤔")
 
 # --- Theory Tab ---
 with tab2:
@@ -245,92 +322,96 @@ with tab3:
          st.header("Circuit Diagram")
         
          if shaping_type == "Positive Clipper":
-          st.image("images/postiveclipper.png", caption="Positive Clipper Circuit", use_container_width=True)
+          st.image("images/postiveclipper.png", caption="Positive Clipper Circuit", width='stretch')
          elif shaping_type== "Negative Clipper":
-          st.image("images/negativeclipper.png", caption="Negative Clipper Circuit", use_container_width=True)
+          st.image("images/negativeclipper.png", caption="Negative Clipper Circuit", width='stretch')
          elif shaping_type== "Positive Clamper":
-          st.image("images/positiveclamper.png", caption="Positive Clamper Circuit", use_container_width=True)
+          st.image("images/positiveclamper.png", caption="Positive Clamper Circuit", width='stretch')
          elif shaping_type== "Negative Clamper":
-          st.image("images/negativeclamper.png", caption="Negative Clamper Circuit", use_container_width=True)
+          st.image("images/negativeclamper.png", caption="Negative Clamper Circuit", width='stretch')
         
-          st.subheader("CRO Displays")
-
+    st.header("CRO Displays")
+    plot_col1, plot_col2, plot_col3 = st.columns(3) 
+    st.text_input("Your Name",key="p2")
         # Perform the simulation based on current widget values.
-         y_input, y_output, t, amp_input, total_duration, input_freq, input_time_s, \
-        V_ref_val, output_high, output_low, shaping_circuit_name = simulate_wave_shaping_circuit(
+    y_input, y_output, t, amp_input, total_duration, input_freq, input_time_s, \
+    V_ref_val, output_high, output_low, shaping_circuit_name = simulate_wave_shaping_circuit(
             amplitude, actual_frequency, selected_wave_type_int,
             selected_shaping_type_int, V_ref
         )
 
         # Plotting for CRO Channel 1 (Input Signal).
-         fig1, ax1 = plt.subplots(figsize=(3, 2), dpi=100)
-         ax1.plot(t, y_input, color='lime')
-         ax1.set_facecolor("black")
-         ax1.axhline(0, color='gray', linewidth=0.5)
-         ax1.axvline(0, color='gray', linewidth=0.5)
+    fig1, ax1 = plt.subplots(figsize=(3, 2), dpi=100)
+    ax1.plot(t, y_input, color='lime')
+    ax1.set_facecolor("black")
+    ax1.axhline(0, color='gray', linewidth=0.5)
+    ax1.axvline(0, color='gray', linewidth=0.5)
         
         # Plot V_ref line on input graph for better visualization.
-         ax1.axhline(V_ref_val, color='red', linestyle='--', linewidth=1, label=f'V_ref={V_ref_val:.2f}V')
-         ax1.legend(loc='lower left', fontsize=7, facecolor='darkgray', edgecolor='white')
+    ax1.axhline(V_ref_val, color='red', linestyle='--', linewidth=1, label=f'V_ref={V_ref_val:.2f}V')
+    ax1.legend(loc='lower left', fontsize=7, facecolor='darkgray', edgecolor='white')
 
         # Adjust Y-axis limits to include input amplitude and V_ref, with padding.
-         max_plot_amp_input = max(amp_input * 1.5, abs(V_ref_val) * 1.2)
-         if max_plot_amp_input == 0: max_plot_amp_input = 1 # Ensure a minimum range if all values are 0.
-         ax1.set_ylim(-max_plot_amp_input, max_plot_amp_input)
+    max_plot_amp_input = max(amp_input * 1.5, abs(V_ref_val) * 1.2)
+    if max_plot_amp_input == 0: max_plot_amp_input = 1 # Ensure a minimum range if all values are 0.
+    ax1.set_ylim(-max_plot_amp_input, max_plot_amp_input)
          
-         ax1.set_xlim(0, total_duration)
-         ax1.tick_params(axis='x', colors='white')
-         ax1.tick_params(axis='y', colors='white')
-         ax1.set_title("Ch 1: Input Signal", color='white', fontsize=10)
-         ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
+    ax1.set_xlim(0, total_duration)
+    ax1.tick_params(axis='x', colors='white')
+    ax1.tick_params(axis='y', colors='white')
+    ax1.set_title("Ch 1: Input Signal", color='white', fontsize=10)
+    ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
-         st.pyplot(fig1) # Display the Matplotlib figure in Streamlit.
+    with plot_col1:    
+        st.pyplot(fig1) # Display the Matplotlib figure in Streamlit.
 
         # Plotting for CRO Channel 2 (Output Signal).
-         fig2, ax2 = plt.subplots(figsize=(3, 2), dpi=100)
-         ax2.plot(t, y_output, color='cyan')
-         ax2.set_facecolor("black")
-         ax2.axhline(0, color='gray', linewidth=0.5)
-         ax2.axvline(0, color='gray', linewidth=0.5)
+    fig2, ax2 = plt.subplots(figsize=(3, 2), dpi=100)
+    ax2.plot(t, y_output, color='cyan')
+    ax2.set_facecolor("black")
+    ax2.axhline(0, color='gray', linewidth=0.5)
+    ax2.axvline(0, color='gray', linewidth=0.5)
         
         # Set Y-axis limits based on the output signal's range, with padding.
         # Ensure a minimum range even if output is flat.
-         max_plot_amp_output = max(abs(output_high), abs(output_low)) * 1.2
-         if max_plot_amp_output == 0: max_plot_amp_output = 1
-         ax2.set_ylim(-max_plot_amp_output, max_plot_amp_output)
+    max_plot_amp_output = max(abs(output_high), abs(output_low)) * 1.2
+    if max_plot_amp_output == 0: max_plot_amp_output = 1
+    ax2.set_ylim(-max_plot_amp_output, max_plot_amp_output)
         
-         ax2.set_xlim(0, total_duration)
-         ax2.tick_params(axis='x', colors='white')
-         ax2.tick_params(axis='y', colors='white')
-         ax2.set_title("Ch 2: Output Signal", color='white', fontsize=10)
-         ax2.text(0.02, 0.95, f'Output High: {output_high:.2f} V', transform=ax2.transAxes,
+    ax2.set_xlim(0, total_duration)
+    ax2.tick_params(axis='x', colors='white')
+    ax2.tick_params(axis='y', colors='white')
+    ax2.set_title("Ch 2: Output Signal", color='white', fontsize=10)
+    ax2.text(0.02, 0.95, f'Output High: {output_high:.2f} V', transform=ax2.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
-         ax2.text(0.02, 0.85, f'Output Low: {output_low:.2f} V', transform=ax2.transAxes,
+    ax2.text(0.02, 0.85, f'Output Low: {output_low:.2f} V', transform=ax2.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
-         st.pyplot(fig2) # Display the Matplotlib figure in Streamlit.
+    with plot_col2:     
+        st.pyplot(fig2) # Display the Matplotlib figure in Streamlit.
 
         # Plotting for Combined View (Channel 1 & 2).
-         fig_combined, ax_combined = plt.subplots(figsize=(6, 3), dpi=100)
-         ax_combined.plot(t, y_input, color='lime', label='Input (Ch 1)')
-         ax_combined.plot(t, y_output, color='cyan', label='Output (Ch 2)')
-         ax_combined.set_facecolor("black")
-         ax_combined.axhline(0, color='gray', linewidth=0.5)
-         ax_combined.axvline(0, color='gray', linewidth=0.5)
+    fig_combined, ax_combined = plt.subplots(figsize=(6, 3), dpi=100)
+    ax_combined.plot(t, y_input, color='lime', label='Input (Ch 1)')
+    ax_combined.plot(t, y_output, color='cyan', label='Output (Ch 2)')
+    ax_combined.set_facecolor("black")
+    ax_combined.axhline(0, color='gray', linewidth=0.5)
+    ax_combined.axvline(0, color='gray', linewidth=0.5)
         
         # Plot V_ref line on combined graph.
-         ax_combined.axhline(V_ref_val, color='red', linestyle='--', linewidth=1, label=f'V_ref={V_ref_val:.2f}V')
+    ax_combined.axhline(V_ref_val, color='red', linestyle='--', linewidth=1, label=f'V_ref={V_ref_val:.2f}V')
 
         # Determine combined Y-axis limit.
-         max_combined_amp = max(max_plot_amp_input, max_plot_amp_output)
-         if max_combined_amp == 0: max_combined_amp = 1
-         ax_combined.set_ylim(-max_combined_amp, max_combined_amp)
+    max_combined_amp = max(max_plot_amp_input, max_plot_amp_output)
+    if max_combined_amp == 0: max_combined_amp = 1
+    ax_combined.set_ylim(-max_combined_amp, max_combined_amp)
         
-         ax_combined.set_xlim(0, total_duration)
-         ax_combined.tick_params(axis='x', colors='white')
-         ax_combined.tick_params(axis='y', colors='white')
-         ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='white', fontsize=10)
-         ax_combined.legend(loc='upper right', fontsize=8, facecolor='darkgray', edgecolor='white')
-         st.pyplot(fig_combined) # Display the Matplotlib figure in Streamlit.
+    ax_combined.set_xlim(0, total_duration)
+    ax_combined.tick_params(axis='x', colors='white')
+    ax_combined.tick_params(axis='y', colors='white')
+    ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='white', fontsize=10)
+    ax_combined.legend(loc='upper right', fontsize=8, facecolor='darkgray', edgecolor='white')
+    with plot_col3:     
+        st.pyplot(fig_combined) # Display the Matplotlib figure in Streamlit.
 
     # --- Dynamic Parameters Table ---
     st.header("Simulation Results")
@@ -356,7 +437,7 @@ with tab3:
     # Display the history as a Pandas DataFrame.
     if st.session_state.simulation_history_shaping:
         df_history = pd.DataFrame(st.session_state.simulation_history_shaping)
-        st.dataframe(df_history, use_container_width=True) # use_container_width makes the table responsive.
+        st.dataframe(df_history, width='stretch') # use_container_width makes the table responsive.
 
     # Button to clear the table history.
     if st.button("Clear Table History", key="clear_table_button_shaping"):
@@ -366,27 +447,38 @@ with tab3:
 # --- Postlab Tab ---
 with tab4:
     st.header("Postlab")
-    st.markdown("""
-    **Conclusion:**
-    * Summarize your observations from the simulation for clippers and clampers.
-    * Explain the effect of changing the reference voltage on the output waveforms.
-    * Discuss the importance of the op-amp in active wave shaping circuits.
-
-    **Analysis:**
-    * For a sinusoidal input with an amplitude of 3V and a V_ref of 1V, describe the resulting output waveforms for a **Positive Clipper** and a **Negative Clipper**.
-    * For the same input, describe the output waveforms for a **Positive Clamper** and a **Negative Clamper**.
-    * Explain a real-world application for a clipper circuit and a clamper circuit.
-    """)
+    st.text_input("Your Name",key="p3")
+    st.subheader("Conclusion:")
+   
+    st.write(" Summarize your observations from the simulation for clippers and clampers.")
+    st.text_area("Your Answer ", height=100, key="postlab_q1")
+    st.write(" Explain the effect of changing the reference voltage on the output waveforms.")
+    st.text_area("Your Answer ", height=100, key="postlab_q2")
+    st.write(" Discuss the importance of the op-amp in active wave shaping circuits.")
+    st.text_area("Your Answer ", height=100, key="postlab_q3")
+    st.subheader("Conclusion:")
+    
+    st.write(" For a sinusoidal input with an amplitude of 3V and a V_ref of 1V, describe the resulting output waveforms for a **Positive Clipper** and a **Negative Clipper**.")
+    st.text_area("Your Answer ", height=100, key="postlab_q4")
+    st.write(" For the same input, describe the output waveforms for a **Positive Clamper** and a **Negative Clamper**.")
+    st.text_area("Your Answer ", height=100, key="postlab_q5")
+    st.write(" Explain a real-world application for a clipper circuit and a clamper circuit.")
+    st.text_area("Your Answer ", height=100, key="postlab_q6")
 
 # --- Feedback Tab ---
 with tab5:
-    st.header("Feedback")
-    st.markdown("""
-    We value your feedback to improve this simulator. Please let us know your thoughts.
-
-    **Instructions:**
-    1.  What did you find most useful about this simulator?
-    2.  Were there any features that were confusing or difficult to use?
-    3.  What new features would you like to see added in the future?
-    4.  Any other comments or suggestions.
-    """)
+   st.header("Feedback")
+   st.markdown("""
+   We value your feedback to improve this simulator. Please let us know your thoughts.
+   """)
+   st.text_input("Your Name")
+   st.text_input("Registration number/Faculty ID")
+   st.slider("How would you rate this simulator?(best -5)", 1, 5)
+  
+   st.text_input("1.  What did you find most useful about this simulator?")
+   st.text_input("2.  Were there any features that were confusing or difficult to use?")
+   st.text_input("3.  What new features would you like to see added in the future?")
+  
+   st.text_area("Any other comments or suggestions.", height=200, key="feedback_text")
+   if st.button("Submit Feedback"):
+     st.success("Thank you for your feedback!")

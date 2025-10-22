@@ -190,7 +190,7 @@ with tab1:
     """)
     st.markdown("---")
     st.subheader("Multiple Choice Questions (MCQ)")
-
+    st.text_input("Your Name",key="p1")
     user_answers = {}
     for i, mcq in enumerate(mcq_questions):
         user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
@@ -229,7 +229,7 @@ with tab2:
         An op-amp integrator is an electronic circuit that performs the mathematical operation of integration on its input signal.
         It uses a resistor at the input and a capacitor in the feedback path. The output voltage is proportional to the time integral of the input voltage.
     """)
-    st.image("images/integrator.png", caption="Op-Amp Integrator Circuit Diagram", use_container_width=True) 
+    st.image("images/integrator.png", caption="Op-Amp Integrator Circuit Diagram", width='stretch') 
    # [Image of an Op-Amp Integrator circuit diagram]
 
     st.markdown("""
@@ -242,7 +242,7 @@ with tab2:
         An op-amp differentiator is an electronic circuit that performs the mathematical operation of differentiation on its input signal.
         It uses a capacitor at the input and a resistor in the feedback path. The output voltage is proportional to the rate of change of the input voltage.
     """)
-    st.image("images/differentiator.png", caption="Op-Amp Differentiator Circuit Diagram", use_container_width=True) 
+    st.image("images/differentiator.png", caption="Op-Amp Differentiator Circuit Diagram", width='stretch') 
 
 #[Image of an Op-Amp Differentiator circuit diagram]
 
@@ -329,9 +329,9 @@ with tab3:
       
         
         if amplifier_type == "Integrator":
-            st.image("images/integrator.png", caption="Integrating Amplifier Circuit", use_container_width=True)
+            st.image("images/integrator.png", caption="Integrating Amplifier Circuit", width='stretch')
         elif amplifier_type == "Differentiator":
-            st.image("images/differentiator.png", caption="Differentiator Circuit", use_container_width=True)
+            st.image("images/differentiator.png", caption="Differentiator Circuit", width='stretch')
        
         
         
@@ -339,7 +339,7 @@ with tab3:
         
         st.markdown("---")
     st.header("CRO Waveforms")
-        
+    st.text_input("Your Name",key="p2")   
         # ------------------------------------------------------------------
         # --- PLOTS IN FULL-WIDTH ROW ---
         # ------------------------------------------------------------------
@@ -430,7 +430,7 @@ with tab3:
     
     if st.session_state.simulation_history:
         df_history = pd.DataFrame(st.session_state.simulation_history)
-        st.dataframe(df_history, use_container_width=True)
+        st.dataframe(df_history, width='stretch')
     
     if st.button("Clear Table History", key="clear_table_button_sim"):
         st.session_state.simulation_history = []
@@ -440,6 +440,7 @@ with tab3:
 # --- Postlab Tab ---
 with tab4:
     st.header("Postlab: Analysis and Conclusion")
+    st.text_input("Your Name",key="p3")
     st.markdown("""
         **Instructions:** Use the simulation results you logged to the table to answer the following questions.
     """)
@@ -459,7 +460,7 @@ with tab4:
 # --- Feedback Tab ---
 with tab5:
     st.header("Feedback")
-    st.write("We would love to hear your thoughts on this simulator.")
+    st.write("We would eager to hear your thoughts on this simulator.")
     st.text_input("Your Name")
     st.text_input("Registration number/Faculty ID")
     st.slider("How would you rate this simulator?(best -5)", 1, 5)

@@ -19,6 +19,67 @@ st.title("Square Wave Generator Simulator")
 # Create the tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Prelab", "Theory", "Simulation", "Postlab", "Feedback"])
 
+mcq_questions = [
+    {
+        "question":("What is the primary function of the RC circuit (RF and C) in this generator?"),
+            "options": [
+                "Filter the output signal to produce a pure sine wave.",
+    "Provide a time-dependent voltage for the inverting input ($V_{in-}$), which dictates the switching points.",
+    "Stabilize the DC operating point of the op-amp.",
+    "Set the output amplitude (peak-to-peak voltage) of the square wave."
+                ],
+            "correct_option_index":1 ,
+            "explanation":"The resistor $R_F$ and capacitor $C$ form a **timing circuit**. The capacitor's voltage $V_C$ charges and discharges exponentially towards the op-amp's output voltage. This voltage, fed back to the inverting input, is the $\\mathbf{V_{in-}}$ signal that is compared against the threshold voltage set by the $R_1/R_2$ divider. The time it takes to charge/discharge determines the oscillation **period**. "
+            },
+    
+    {
+        "question":("What is the role of the voltage divider (R1 and R2) at the non-inverting input?"),
+            "options": [
+                "The value of the timing resistor ($R_F$).",
+    "The values of the voltage divider resistors ($R_1$ and $R_2$).",
+    " The power supply voltages** ($\pm V_{CC}$) connected to the op-amp.",
+    " The charging time constant ($\\tau = R_F C$)."
+                ],
+            "correct_option_index":2,
+            "explanation":"The op-amp output voltage ($V_o$) is constrained by the power supplies ($\pm V_{CC}$). In saturation, the output voltage is near, but slightly less than, the supply voltage. Thus, $\mathbf{V_{sat} \\approx V_{CC}}$. The other components determine the **frequency**, not the amplitude."
+            },
+    {
+        "question":("Identify the concept of positive and negative saturation in an op-amp."),
+            "options": [
+                " Ensure a linear, sinusoidal output waveform.",
+    " Precisely control the charging and discharging of the capacitor.",
+    " Force the output to quickly switch and remain at one of the saturation voltages ($+V_{sat}$ or $-V_{sat}$)." ,
+    " Decrease the overall gain of the circuit for stability."
+                ],
+            "correct_option_index":2 ,
+            "explanation":" Positive feedback is key for **comparator circuits and oscillators**. When the input voltages $V_{in+}$ and $V_{in-}$ cross, the positive feedback causes the op-amp to swiftly and decisively switch its output to the opposite saturation limit (either $+V_{sat}$ or $-V_{sat}$), maintaining the stable-but-temporary state required for oscillation."
+            },
+    {
+        "question":("How does the capacitor's voltage affect the op-amp's output state?"),
+            "options": [
+                " Ground (0V).",
+    " Positive saturation ($+V_{sat}$).",
+    " Negative saturation ($-V_{sat}$).",
+    "Oscillating rapidly between $+V_{sat}$ and $-V_{sat}$."
+                ],
+            "correct_option_index":1 ,
+            "explanation":" The op-amp is acting as a comparator. If $\mathbf{V_{in+} > V_{in-}}$ (non-inverting input voltage is greater), the output is driven to the **maximum positive limit** ($+V_{sat}$). The capacitor voltage $V_C$ is $V_{in-}$, and $V_{ref}$ is $V_{in+}$."
+            },
+    {
+        "question":("How would changing the value of C or RF affect the output frequency?"),
+            "options": [
+                " Decrease the value of the capacitor $C$.",
+    " Decrease the value of the timing resistor $R_F$.",
+    " Increase the value of $C$ or $R_F$** (or both).",
+    "Only change the ratio of $R_1$ and $R_2$."
+                ],
+            "correct_option_index":2 ,
+            "explanation":"The oscillation **frequency ($f$)** is inversely proportional to the **time constant** $\\tau = R_F C$. The formula for the frequency is $f = \\frac{1}{2 R_F C \\ln(1 + 2R_2/R_1)}$. To **decrease** the frequency (i.e., increase the period), you must **increase** the time constant $\\tau$, which means increasing $R_F$ or $C$."
+            }
+    ]
+    
+
+
 # --- Prelab Tab ---
 with tab1:
     st.header("Prelab")
@@ -30,13 +91,33 @@ with tab1:
     2.  Understanding of resistor-capacitor (RC) circuits and their charging/discharging behavior.
     3.  Familiarity with positive feedback in op-amp circuits.
 
-    **Questions:**
-    1.  What is the primary function of the RC circuit (RF and C) in this generator?
-    2.  What is the role of the voltage divider (R1 and R2) at the non-inverting input?
-    3.  Explain the concept of positive and negative saturation in an op-amp.
-    4.  How does the capacitor's voltage affect the op-amp's output state?
-    5.  How would changing the value of C or RF affect the output frequency?
     """)
+    
+    st.subheader("Multiple Choice Questions (MCQ)")
+    st.text_input("Your Name",key="p1")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions):
+       user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+
+    if st.button("Submit Answers", key="submit_mcq"):
+       st.subheader("Results")
+       all_correct = True
+       for i, mcq in enumerate(mcq_questions):
+           correct_answer = mcq["options"][mcq["correct_option_index"]]
+           if user_answers[i] == correct_answer:
+               st.success(f"**Question {i+1}: Correct!** ✅")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+           else:
+               st.error(f"**Question {i+1}: Incorrect.** ❌")
+               st.markdown(f"**Correct Answer:** {correct_answer}")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               all_correct = False
+       
+       if all_correct:
+           st.balloons()
+           st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
+       else:
+           st.warning("Please review the theory and try again. 🤔")
 
 # --- Theory Tab ---
 with tab2:
@@ -200,10 +281,10 @@ with tab3:
     with col2:
         st.header("Circuit Diagram")
         
-        st.image("images/squarewavegenerator.png", caption="Square Wave Generator Circuit", use_container_width=True)
+        st.image("images/squarewavegenerator.png", caption="Square Wave Generator Circuit", width='stretch')
         
         st.subheader("CRO Display")
-    
+        st.text_input("Your Name",key="p2")
         sim_results = calculate_square_wave_parameters(RF_kohm, C_uF, R1_kohm, R2_kohm)
     
         if sim_results is not None:
@@ -229,12 +310,12 @@ with tab3:
                       fontsize=8, color='white', verticalalignment='top')
             st.pyplot(fig1)
     
-            st.header("Simulation Results")
+    st.header("Simulation Results")
     
-            if 'square_wave_history' not in st.session_state:
+    if 'square_wave_history' not in st.session_state:
                 st.session_state.square_wave_history = []
     
-            if st.button("Log Current Results to Table", key="log_button_sq_wave"):
+    if st.button("Log Current Results to Table", key="log_button_sq_wave"):
                 new_entry = {
                     "RF (kΩ)": f"{sim_results['RF_kohm']:.2f}",
                     "C (µF)": f"{sim_results['C_uF']:.2f}",
@@ -249,40 +330,50 @@ with tab3:
                 }
                 st.session_state.square_wave_history.append(new_entry)
     
-            if st.session_state.square_wave_history:
+    if st.session_state.square_wave_history:
                 df_history = pd.DataFrame(st.session_state.square_wave_history)
-                st.dataframe(df_history, use_container_width=True)
+                st.dataframe(df_history, width='stretch')
     
-            if st.button("Clear Table History", key="clear_table_button_sq_wave"):
+    if st.button("Clear Table History", key="clear_table_button_sq_wave"):
                 st.session_state.square_wave_history = []
                 st.rerun()
-        else:
+    else:
             st.warning("Please adjust parameters to allow for oscillation.")
 
 # --- Postlab Tab ---
 with tab4:
     st.header("Postlab")
-    st.markdown("""
-    **Conclusion:**
-    * Summarize your observations from the simulation regarding the effect of changing RF, C, R1, and R2 on the output frequency and amplitude.
-    * Explain why this circuit is often called a "free-running" or "astable" multivibrator.
-    * What would happen if the capacitor C was replaced by a short circuit? Explain the outcome.
+    st.text_input("Your Name",key="p3")
+    st.subheader("Conclusion:")
+    st.write(" Summarize your observations from the simulation regarding the effect of changing RF, C, R1, and R2 on the output frequency and amplitude.")
+    st.text_area("Your Answer ", height=100, key="postlab_q1")
+    st.write(" Explain why this circuit is often called a free-running or astable multivibrator.")
+    st.text_area("Your Answer ", height=100, key="postlab_q2")
+    st.write(" What would happen if the capacitor C was replaced by a short circuit? Explain the outcome.")
+    st.text_area("Your Answer ", height=100, key="postlab_q3")
 
-    **Analysis:**
-    * Using the formula, calculate the period and frequency of the square wave if $R_F = 20k\Omega$, $C = 0.05\mu F$, $R_1 = 10k\Omega$, and $R_2 = 10k\Omega$.
-    * If you wanted to double the frequency of the output, what simple change could you make to the circuit's components?
-    * How does the output amplitude of the square wave relate to the op-amp's power supply?
-    """)
+    st.subheader("Analysis:")
+    st.write(" Using the formula, calculate the period and frequency of the square wave if $R_F = 20k\Omega$, $C = 0.05\mu F$, $R_1 = 10k\Omega$, and $R_2 = 10k\Omega$.")
+    st.text_area("Your Answer ", height=100, key="postlab_q4")
+    st.write(" If you wanted to double the frequency of the output, what simple change could you make to the circuit's components?")
+    st.text_area("Your Answer ", height=100, key="postlab_q5")
+    st.write("How does the output amplitude of the square wave relate to the op-amp's power supply?")
+    st.text_area("Your Answer ", height=100, key="postlab_q6")
 
 # --- Feedback Tab ---
 with tab5:
     st.header("Feedback")
     st.markdown("""
     We value your feedback to improve this simulator. Please let us know your thoughts.
-
-    **Instructions:**
-    1.  What did you find most useful about this simulator?
-    2.  Were there any features that were confusing or difficult to use?
-    3.  What new features would you like to see added in the future?
-    4.  Any other comments or suggestions.
     """)
+    st.text_input("Your Name")
+    st.text_input("Registration number/Faculty ID")
+    st.slider("How would you rate this simulator?(best -5)", 1, 5)
+   
+    st.text_input("1.  What did you find most useful about this simulator?")
+    st.text_input("2.  Were there any features that were confusing or difficult to use?")
+    st.text_input("3.  What new features would you like to see added in the future?")
+   
+    st.text_area("Any other comments or suggestions.", height=200, key="feedback_text")
+    if st.button("Submit Feedback"):
+      st.success("Thank you for your feedback!")

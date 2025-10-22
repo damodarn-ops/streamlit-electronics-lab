@@ -18,6 +18,68 @@ st.title("RC Phase Shift Oscillator Simulator")
 
 # Create the tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Prelab", "Theory", "Simulation", "Postlab", "Feedback"])
+mcq_questions = [
+    {
+        "question":("The primary purpose of the op-amp in an RC phase shift oscillator is:"),
+         "options": [
+          " To provide $180^\circ$ of phase shift.",
+         " To act as a voltage buffer.",
+         "To provide sufficient gain to compensate for the feedback network\'s attenuation.",
+         "To filter out unwanted frequencies."
+         ],
+         
+    "correct_option_index": 2,
+    "explanation":"The op-amp provides the necessary **amplification** ($A \geq 29$) to ensure the loop gain $ 1$, which is crucial for sustained oscillations according to the Barkhausen criterion."     
+         },
+    {
+     
+        "question":("How many RC stages are minimally required in the feedback network of an RC phase shift oscillator to produce $180^\circ$ phase shift?"),
+        "options": [
+            " One",
+         "Two",
+         "Three",
+         "Four"
+          ],
+     "correct_option_index": 2,
+     "explanation":"A single RC stage can provide a maximum phase shift of $90^\circ$. A minimum of **three** cascaded stages is required to reliably achieve the $180^\circ$ phase shift and maintain stable operation at a specific frequency."
+     },
+    {
+     "question":("If the resistance R in all stages of an RC phase shift oscillator is doubled, the frequency of oscillation ($f_o$) will:"),
+     "options": [
+         "Remain the same.",
+         "Halve (decrease by a factor of 2).",
+         "Double (increase by a factor of 2).",
+         " Decrease by a factor of $\sqrt{2}$."
+         ],
+     "correct_option_index": 1,
+     "explanation":"The frequency of oscillation is $\mathbf{f_o \\propto \\frac{1}{RC}}$. If $R$ is doubled, the frequency becomes $f'_o \\propto \\frac{1}{(2R)C} = \\frac{1}{2} f_o$. The frequency is **halved**."
+     },
+    {
+     "question":("The total phase shift around the loop in a sustained RC phase shift oscillator must be:"),
+     "options": [
+         "$90^\circ$",
+          "$180^\circ$",
+         "$270^\circ$",
+         "$360^\circ$ (or $0^\circ$)"
+         ],
+     "correct_option_index": 3,
+     "explanation":"The second condition of the Barkhausen criterion requires the total phase shift around the closed loop to be $0^\circ$ or $360^\circ n$ for positive feedback necessary for oscillation."
+    
+     },
+    {
+     "question":("The frequency of oscillation $f_o$ of a three-stage RC phase shift oscillator using identical R and C components is given by:"),
+       "options": [
+            "$\\frac{1}{2\\pi RC}$",
+         "$\\frac{1}{2\\pi RC\\sqrt{2}}$",
+         "$\\frac{1}{2\\pi RC\\sqrt{6}}$",
+         "$\\frac{1}{2\\pi RC\\sqrt{3}}$"
+           ],
+     "correct_option_index": 2,
+     "explanation":"This is the standard formula for the frequency of oscillation of an RC phase shift oscillator with three identical RC stages."
+     }
+    ]
+
+
 
 # --- Prelab Tab ---
 with tab1:
@@ -29,14 +91,33 @@ with tab1:
     1.  Knowledge of operational amplifiers (op-amps).
     2.  Understanding of resistor-capacitor (RC) networks and their phase shifting properties.
     3.  Familiarity with the Barkhausen criterion for oscillation.
-
-    **Questions:**
-    1.  What is the Barkhausen criterion for oscillation?
-    2.  Explain why a phase shift of 180° is required from the feedback network in an RC phase shift oscillator.
-    3.  How is the remaining 180° phase shift achieved?
-    4.  What is the minimum gain required from the amplifier stage to sustain oscillations?
-    5.  How does changing the value of R or C affect the frequency of oscillation?
     """)
+    
+    st.subheader("Multiple Choice Questions (MCQ)")
+    st.text_input("Your Name",key="p1")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions):
+       user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+
+    if st.button("Submit Answers", key="submit_mcq"):
+       st.subheader("Results")
+       all_correct = True
+       for i, mcq in enumerate(mcq_questions):
+           correct_answer = mcq["options"][mcq["correct_option_index"]]
+           if user_answers[i] == correct_answer:
+               st.success(f"**Question {i+1}: Correct!** ✅")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+           else:
+               st.error(f"**Question {i+1}: Incorrect.** ❌")
+               st.markdown(f"**Correct Answer:** {correct_answer}")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               all_correct = False
+       
+       if all_correct:
+           st.balloons()
+           st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
+       else:
+           st.warning("Please review the theory and try again. 🤔")
 
 # --- Theory Tab ---
 with tab2:
@@ -172,10 +253,10 @@ with tab3:
     with col2:
         st.header("Circuit Diagram")
         
-        st.image("images/RCphaseshiftoscillator.png", caption="RC Phaseshift Oscillator Circuit", use_container_width=True)
+        st.image("images/RCphaseshiftoscillator.png", caption="RC Phaseshift Oscillator Circuit", width='stretch')
         
         st.subheader("CRO Display")
-
+        st.text_input("Your Name",key="p2")
         sim_results = calculate_oscillation_parameters(R_kohm, C_uF, f_desired)
 
         # Plotting for Output Signal (CH1)
@@ -201,12 +282,12 @@ with tab3:
                   fontsize=8, color='white', verticalalignment='top')
         st.pyplot(fig1)
 
-        st.header("Simulation Results")
+    st.header("Simulation Results")
 
-        if 'oscillator_history' not in st.session_state:
+    if 'oscillator_history' not in st.session_state:
             st.session_state.oscillator_history = []
 
-        if st.button("Log Current Results to Table", key="log_button_oscillator"):
+    if st.button("Log Current Results to Table", key="log_button_oscillator"):
             new_entry = {
                 "Input R (kΩ)": f"{sim_results['R_input_kohm']:.2f}",
                 "Input C (µF)": f"{sim_results['C_input_uF']:.2f}",
@@ -220,38 +301,48 @@ with tab3:
             }
             st.session_state.oscillator_history.append(new_entry)
 
-        if st.session_state.oscillator_history:
+    if st.session_state.oscillator_history:
             df_history = pd.DataFrame(st.session_state.oscillator_history)
-            st.dataframe(df_history, use_container_width=True)
+            st.dataframe(df_history, width='stretch')
 
-        if st.button("Clear Table History", key="clear_table_button_oscillator"):
+    if st.button("Clear Table History", key="clear_table_button_oscillator"):
             st.session_state.oscillator_history = []
             st.rerun()
 
 # --- Postlab Tab ---
 with tab4:
     st.header("Postlab")
-    st.markdown("""
-    **Conclusion:**
-    * Summarize your observations from the simulation, focusing on the relationship between R, C, and the output frequency.
-    * Explain how the calculated amplifier resistor values (R1 and RF) are related to the required gain.
-    * Discuss the limitations of this ideal simulation compared to a real-world circuit.
-
-    **Analysis:**
-    * Using the formula, calculate the required R and C values for a 500 Hz oscillation.
-    * If the input R is 10kΩ and C is 0.01µF, what is the output frequency?
-    * What are some advantages and disadvantages of using an RC phase shift oscillator?
-    """)
+    st.text_input("Your Name",key="p3")
+    st.subheader("Conclusion:")
+    st.write("Summarize your observations from the simulation, focusing on the relationship between R, C, and the output frequency.")
+    st.text_area("Your Answer ", height=100, key="postlab_q1")
+    st.write( "Explain how the calculated amplifier resistor values (R1 and RF) are related to the required gain.")
+    st.text_area("Your Answer ", height=100, key="postlab_q2")
+    st.write( "Discuss the limitations of this ideal simulation compared to a real-world circuit.")
+    st.text_area("Your Answer ", height=100, key="postlab_q3")
+    
+    st.subheader("Analysis:")
+    st.write("Using the formula, calculate the required R and C values for a 500 Hz oscillation.")
+    st.text_area("Your Answer ", height=100, key="postlab_q4")
+    st.write("If the input R is 10kΩ and C is 0.01µF, what is the output frequency?")
+    st.text_area("Your Answer ", height=100, key="postlab_q5")
+    st.write(" What are some advantages and disadvantages of using an RC phase shift oscillator?")
+    st.text_area("Your Answer ", height=100, key="postlab_q6")
 
 # --- Feedback Tab ---
 with tab5:
     st.header("Feedback")
     st.markdown("""
     We value your feedback to improve this simulator. Please let us know your thoughts.
-
-    **Instructions:**
-    1.  What did you find most useful about this simulator?
-    2.  Were there any features that were confusing or difficult to use?
-    3.  What new features would you like to see added in the future?
-    4.  Any other comments or suggestions.
     """)
+    st.text_input("Your Name")
+    st.text_input("Registration number/Faculty ID")
+    st.slider("How would you rate this simulator?(best -5)", 1, 5)
+   
+    st.text_input("1.  What did you find most useful about this simulator?")
+    st.text_input("2.  Were there any features that were confusing or difficult to use?")
+    st.text_input("3.  What new features would you like to see added in the future?")
+   
+    st.text_area("Any other comments or suggestions.", height=200, key="feedback_text")
+    if st.button("Submit Feedback"):
+      st.success("Thank you for your feedback!")

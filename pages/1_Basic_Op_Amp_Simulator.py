@@ -129,7 +129,7 @@ with tab1:
     
 # --- MCQ Questions Section ---
     st.subheader("MCQ Questions")
-
+    st.text_input("Your Name",key="p1")
     questions = [
         {
             "question": "What is the typical output impedance of an ideal operational amplifier?",
@@ -204,17 +204,17 @@ with tab2:
     st.write("An operational amplifier is a DC-coupled high-gain electronic voltage amplifier with a differential input and, usually, a single-ended output. A key characteristic of the ideal Op-Amp is that it has infinite input impedance and zero output impedance.")
     st.markdown("#### Inverting Amplifier")
     st.write("In this configuration, the input signal is applied to the inverting input terminal. The output voltage is out of phase with the input and its gain is determined by the ratio of the feedback resistor ($R_f$) to the input resistor ($R_1$).")
-    st.image("images/invertingamplifier.png", caption="Inverting Amplifier Circuit", use_container_width=True)
+    st.image("images/invertingamplifier.png", caption="Inverting Amplifier Circuit", width='stretch')
     st.latex(r"V_{out} = -\left(\frac{R_f}{R_1}\right) V_{in}")
     
     st.markdown("#### Non-Inverting Amplifier")
     st.write("Here, the input signal is applied to the non-inverting input terminal. The output voltage is in phase with the input and its gain is given by the formula:")
-    st.image("images/Noninvertingamplifier.png", caption="Non-Inverting Amplifier Circuit", use_container_width=True)
+    st.image("images/Noninvertingamplifier.png", caption="Non-Inverting Amplifier Circuit", width='stretch')
     st.latex(r"V_{out} = \left(1 + \frac{R_f}{R_1}\right) V_{in}")
     
     st.markdown("#### Buffer Amplifier (Voltage Follower)")
     st.write("A buffer amplifier is a non-inverting amplifier with a gain of 1. It is used to isolate one stage of a circuit from another, providing high input impedance and low output impedance.")
-    st.image("images/voltagefollower.png", caption="Buffer Amplifier (Voltage Follower) Circuit", use_container_width=True)
+    st.image("images/voltagefollower.png", caption="Buffer Amplifier (Voltage Follower) Circuit", width='stretch')
     st.latex(r"V_{out} = V_{in}")
 
 with tab3:
@@ -326,18 +326,18 @@ with tab3:
         st.header(" Circuit Diagram")
         
         if amplifier_type == "Inverting Amplifier":
-            st.image("images/invertingamplifier.png", caption="Inverting Amplifier Circuit", use_container_width=True)
+            st.image("images/invertingamplifier.png", caption="Inverting Amplifier Circuit", width='stretch')
         elif amplifier_type == "Non-Inverting Amplifier":
-            st.image("images/Noninvertingamplifier.png", caption="Non-Inverting Amplifier Circuit", use_container_width=True)
+            st.image("images/Noninvertingamplifier.png", caption="Non-Inverting Amplifier Circuit", width='stretch')
         elif amplifier_type == "Voltage Follower":
-            st.image("images/voltagefollower.png", caption="Buffer Amplifier (Voltage Follower) Circuit", use_container_width=True)
+            st.image("images/voltagefollower.png", caption="Buffer Amplifier (Voltage Follower) Circuit", width='stretch')
         else:
             st.info("Select an amplifier type to display its circuit diagram.")
         
     
     st.markdown("---")
     st.subheader("CRO Waveforms")
-    
+    st.text_input("Your Name",key="p2")
     # ------------------------------------------------------------------
     # --- PLOTS IN FULL-WIDTH ROW ---
     # ------------------------------------------------------------------
@@ -459,6 +459,7 @@ with tab3:
 
 with tab4:
     st.header("Postlab Questions")
+    st.text_input("Your Name",key="p3")
     st.markdown("""
     - **Instructions:** Use the logged simulation results to answer the following questions.
     1. Compare the theoretical gain values you calculated in the Prelab to the output amplitude values from the simulation. Are they the same? If not, what factors might cause the difference (e.g., clipping)?
@@ -476,7 +477,7 @@ with tab5:
     st.markdown("""
     Your feedback is valuable to us! Please provide your comments on the simulator.
     """)
-    st.write("We would love to hear your thoughts on this simulator.")
+    st.write("We would eager to hear your thoughts on this simulator.")
     st.text_input("Your Name")
     st.text_input("Registration number/Faculty ID")
     st.slider("How would you rate this simulator?(best -5)", 1, 5)

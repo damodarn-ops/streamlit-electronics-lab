@@ -38,6 +38,20 @@ mcq_questions = [
         "options": ["Resistance and Inductance", "Capacitance and Inductance", "Resistance and Capacitance", "Voltage and Current"],
         "answer_index": 2,
         "explanation": "The cutoff frequency for an RC filter is directly dependent on the values of the resistor (R) and capacitor (C), calculated as $f_c = \\frac{1}{2\\pi RC}$."
+    },
+    # --- New MCQ 4 ---
+    {
+        "question": "4. The primary role of the Op-Amp in a first-order active filter is to:",
+        "options": ["Set the cutoff frequency.", "Act as a current sink.", "Provide gain and isolate the filter stage from the load.", "Serve as the passive RC component."],
+        "answer_index": 2,
+        "explanation": "The op-amp provides voltage gain in the passband and, most importantly, acts as a buffer (isolating the filter stage from the next stage/load), which prevents the load from affecting the filter's characteristic frequency."
+    },
+    # --- New MCQ 5 ---
+    {
+        "question": "5. The voltage gain ($A_v$) for the non-inverting op-amp configuration used in many active filters is given by the formula:",
+        "options": ["$A_v = -\\frac{R_f}{R_{in}}$", "$A_v = 1 + \\frac{R_f}{R_{g}}$", "$A_v = \\frac{R_f}{R_{in}}$", "$A_v = 1$"],
+        "answer_index": 1,
+        "explanation": "The voltage gain of a non-inverting op-amp amplifier is set by the feedback resistor ($R_f$) and the resistor to ground ($R_g$, often called $R_1$ and $R_2$ in the prelab) using the formula $A_v = 1 + \\frac{R_f}{R_{g}}$."
     }
 ]
 
@@ -53,16 +67,11 @@ with tab1:
     2.  Knowledge of operational amplifiers (op-amps) in non-inverting amplifier configuration.
     3.  Familiarity with concepts like cutoff frequency ($f_c$) and gain.
 
-    **Questions:**
-    1.  What is the primary difference between an active filter and a passive filter?
-    2.  What are the main advantages of using an active filter?
-    3.  How is the cutoff frequency of a first-order RC filter determined?
-    4.  What is the role of the op-amp in an active filter circuit?
-    5.  How is the gain of a non-inverting op-amp determined?
+    
     """)
     st.markdown("---")
     st.header("Multiple Choice Questions (MCQ)")
-
+    st.text_input("Your Name",key="p1")
     user_answers = {}
     for i, mcq in enumerate(mcq_questions):
         user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
@@ -309,60 +318,62 @@ with tab3:
         st.header(" Circuit Diagram")
         
         if filter_type == "Lowpass Filter":
-            st.image("images/LPF.png", caption="Lowpass Filter Circuit", use_container_width=True)
+            st.image("images/LPF.png", caption="Lowpass Filter Circuit", width='stretch')
         elif filter_type == "Highpass Filter":
-            st.image("images/HPF.png", caption="Highpass Filter Circuit", use_container_width=True)
+            st.image("images/HPF.png", caption="Highpass Filter Circuit", width='stretch')
         
-        st.subheader("CRO Displays")
-
-        sim_data = simulate_filter_circuit(
+    st.header("CRO Displays")
+    st.text_input("Your Name",key="p2")
+# Create three columns *outside* the col1/col2/col3 definition to span the full width
+    plot_col1, plot_col2 = st.columns(2)
+    sim_data = simulate_filter_circuit(
             amplitude, actual_frequency, selected_wave_type_int,
             selected_filter_type_int, R1_kohm, RF_kohm, C_uF, R_kohm
         )
 
-        y_input, y_output, t, amp_input, total_duration, input_freq, \
-        output_amplitude, gain_vv, gain_db, filter_name, plot_ylim_output, amplitude_display_text, fc = sim_data
+    y_input, y_output, t, amp_input, total_duration, input_freq, \
+    output_amplitude, gain_vv, gain_db, filter_name, plot_ylim_output, amplitude_display_text, fc = sim_data
 
-        fig1, ax1 = plt.subplots(figsize=(3, 2), dpi=100)
-        ax1.plot(t, y_input, color='lime')
-        ax1.set_facecolor("black")
-        ax1.axhline(0, color='gray', linewidth=0.5)
-        ax1.axvline(0, color='gray', linewidth=0.5)
+    fig1, ax1 = plt.subplots(figsize=(3, 2), dpi=100)
+    ax1.plot(t, y_input, color='lime')
+    ax1.set_facecolor("black")
+    ax1.axhline(0, color='gray', linewidth=0.5)
+    ax1.axvline(0, color='gray', linewidth=0.5)
         
-        max_plot_amp_input = amp_input * 1.5 if amp_input != 0 else 1.0
-        ax1.set_ylim(-max_plot_amp_input, max_plot_amp_input)
+    max_plot_amp_input = amp_input * 1.5 if amp_input != 0 else 1.0
+    ax1.set_ylim(-max_plot_amp_input, max_plot_amp_input)
         
-        ax1.set_xlim(0, total_duration)
-        ax1.tick_params(axis='x', colors='white')
-        ax1.tick_params(axis='y', colors='white')
-        ax1.set_title("Ch 1: Input Signal", color='white', fontsize=10)
-        ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
+    ax1.set_xlim(0, total_duration)
+    ax1.tick_params(axis='x', colors='white')
+    ax1.tick_params(axis='y', colors='white')
+    ax1.set_title("Ch 1: Input Signal", color='white', fontsize=10)
+    ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
-        st.pyplot(fig1)
+    with plot_col1:    st.pyplot(fig1)
 
-        fig2, ax2 = plt.subplots(figsize=(3, 2), dpi=100)
-        ax2.plot(t, y_output, color='cyan')
-        ax2.set_facecolor("black")
-        ax2.axhline(0, color='gray', linewidth=0.5)
-        ax2.axvline(0, color='gray', linewidth=0.5)
+    fig2, ax2 = plt.subplots(figsize=(3, 2), dpi=100)
+    ax2.plot(t, y_output, color='cyan')
+    ax2.set_facecolor("black")
+    ax2.axhline(0, color='gray', linewidth=0.5)
+    ax2.axvline(0, color='gray', linewidth=0.5)
         
-        ax2.set_ylim(-plot_ylim_output, plot_ylim_output)
-        ax2.set_xlim(0, total_duration)
-        ax2.tick_params(axis='x', colors='white')
-        ax2.tick_params(axis='y', colors='white')
-        ax2.set_title("Ch 2: Output Signal", color='white', fontsize=10)
-        ax2.text(0.02, 0.95, amplitude_display_text, transform=ax2.transAxes,
+    ax2.set_ylim(-plot_ylim_output, plot_ylim_output)
+    ax2.set_xlim(0, total_duration)
+    ax2.tick_params(axis='x', colors='white')
+    ax2.tick_params(axis='y', colors='white')
+    ax2.set_title("Ch 2: Output Signal", color='white', fontsize=10)
+    ax2.text(0.02, 0.95, amplitude_display_text, transform=ax2.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
-        st.pyplot(fig2)
+    with plot_col2:    st.pyplot(fig2)
 
-        st.subheader("Frequency Response (Gain vs. Frequency)")
+    st.subheader("Frequency Response (Gain vs. Frequency)")
 
-        if 'frequency_response_data' not in st.session_state:
+    if 'frequency_response_data' not in st.session_state:
             st.session_state.frequency_response_data = []
-        if 'sl_no_counter_filter' not in st.session_state:
+    if 'sl_no_counter_filter' not in st.session_state:
             st.session_state.sl_no_counter_filter = 0
 
-        if st.button("Add Current Point & Log to Table", key="add_point_log_button"):
+    if st.button("Add Current Point & Log to Table", key="add_point_log_button"):
             st.session_state.sl_no_counter_filter += 1
 
             freq_str = f"{input_freq:.2f}"
@@ -388,16 +399,16 @@ with tab3:
             
             st.rerun()
 
-        fig_semilog, ax_semilog = plt.subplots(figsize=(6, 3), dpi=100)
-        ax_semilog.set_facecolor("black")
-        ax_semilog.axhline(0, color='gray', linewidth=0.5)
-        ax_semilog.axvline(0, color='gray', linewidth=0.5)
+    fig_semilog, ax_semilog = plt.subplots(figsize=(6, 3), dpi=100)
+    ax_semilog.set_facecolor("black")
+    ax_semilog.axhline(0, color='gray', linewidth=0.5)
+    ax_semilog.axvline(0, color='gray', linewidth=0.5)
         
-        if not st.session_state.frequency_response_data:
+    if not st.session_state.frequency_response_data:
             ax_semilog.text(0.5, 0.5, "No data to plot.\nClick 'Add Current Point & Log to Table'.",
                              horizontalalignment='center', verticalalignment='center',
                              transform=ax_semilog.transAxes, color='white', fontsize=12)
-        else:
+    else:
             sorted_data = sorted(st.session_state.frequency_response_data, key=lambda x: x[0])
             frequencies_plot = [d[0] for d in sorted_data]
             gains_db_plot = [d[1] for d in sorted_data]
@@ -414,50 +425,60 @@ with tab3:
                 ax_semilog.axvline(fc, color='red', linestyle=':', label=f'Cutoff Freq: {fc:.2f} Hz')
                 ax_semilog.legend(loc='upper right', fontsize=7, facecolor='darkgray', edgecolor='white')
 
-        st.pyplot(fig_semilog)
+    st.pyplot(fig_semilog)
 
-        col_clear1, col_clear2 = st.columns(2)
-        with col_clear1:
+    col_clear1, col_clear2 = st.columns(2)
+    with col_clear1:
             if st.button("Clear Freq Response Plot", key="clear_freq_plot_button"):
                 st.session_state.frequency_response_data = []
                 st.rerun()
-        with col_clear2:
+    with col_clear2:
             if st.button("Clear Table History", key="clear_table_history_button"):
                 st.session_state.filter_table_history = []
                 st.session_state.sl_no_counter_filter = 0
                 st.rerun()
 
-        st.subheader("Simulation Results Table")
-        if 'filter_table_history' in st.session_state and st.session_state.filter_table_history:
+    st.subheader("Simulation Results Table")
+    if 'filter_table_history' in st.session_state and st.session_state.filter_table_history:
             df_history = pd.DataFrame(st.session_state.filter_table_history)
-            st.dataframe(df_history, use_container_width=True)
-        else:
+            st.dataframe(df_history, width='stretch')
+    else:
             st.info("No simulation results logged yet. Adjust parameters and click 'Add Current Point & Log to Table'.")
 
 # --- Postlab Tab ---
 with tab4:
     st.header("Postlab: Analysis and Conclusion")
-    st.markdown("""
-    **Conclusion:**
-    * Based on your simulation, describe how the output signal changes as the input frequency varies for both the low-pass and high-pass filter configurations.
-    * How did the simulated gain (in dB) change in relation to the cutoff frequency? Was this what you expected?
-    * Explain the significance of the cutoff frequency ($f_c$) for each filter type.
+    st.text_input("Your Name",key="p3")
+    st.subheader("Conclusion:")
+    st.write(" Based on your simulation, describe how the output signal changes as the input frequency varies for both the low-pass and high-pass filter configurations.")
+    st.text_area("Your Answer ", height=100, key="postlab_q1")
+    st.write(" How did the simulated gain (in dB) change in relation to the cutoff frequency? Was this what you expected?")
+    st.text_area("Your Answer ", height=100, key="postlab_q2")
+    st.write(" Explain the significance of the cutoff frequency ($f_c$) for each filter type.")
+    st.text_area("Your Answer ", height=100, key="postlab_q3")
 
-    **Analysis:**
-    * If you set $R = 15k\Omega$ and $C = 0.05\mu F$, what is the theoretical cutoff frequency?
-    * Calculate the gain in dB if $R_F = 20k\Omega$ and $R_1 = 5k\Omega$.
-    * How would you modify a low-pass filter to pass only frequencies below 100 Hz?
-    """)
+    st.subheader("Analysis:")
+    st.write("If you set $R = 15k\Omega$ and $C = 0.05\mu F$, what is the theoretical cutoff frequency?")
+    st.text_area("Your Answer ", height=100, key="postlab_q4")
+    st.write(" Calculate the gain in dB if $R_F = 20k\Omega$ and $R_1 = 5k\Omega$.")
+    st.text_area("Your Answer ", height=100, key="postlab_q5")
+    st.write(" How would you modify a low-pass filter to pass only frequencies below 100 Hz?")
+    st.text_area("Your Answer ", height=100, key="postlab_q6")
 
 # --- Feedback Tab ---
 with tab5:
     st.header("Feedback")
     st.markdown("""
     We value your feedback to improve this simulator. Please let us know your thoughts.
-
-    **Instructions:**
-    1.  What did you find most useful about this simulator?
-    2.  Were there any features that were confusing or difficult to use?
-    3.  What new features would you like to see added in the future?
-    4.  Any other comments or suggestions.
     """)
+    st.text_input("Your Name")
+    st.text_input("Registration number/Faculty ID")
+    st.slider("How would you rate this simulator?(best -5)", 1, 5)
+   
+    st.text_input("1.  What did you find most useful about this simulator?")
+    st.text_input("2.  Were there any features that were confusing or difficult to use?")
+    st.text_input("3.  What new features would you like to see added in the future?")
+   
+    st.text_area("Any other comments or suggestions.", height=200, key="feedback_text")
+    if st.button("Submit Feedback"):
+      st.success("Thank you for your feedback!")
