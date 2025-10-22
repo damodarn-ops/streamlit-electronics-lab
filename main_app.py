@@ -107,7 +107,8 @@ experiments = {
     "Wien Bridge Oscillator": "Wien_Bridge_Oscillator",
     "Square Wave Generator": "Square_Wave_Generator",
     "Active Filter": "Active_Filter",
-    "Info": "Info"
+    "Info": "Info",
+    "Feedback": "Feedback"
 }
 
 # --- DISPLAY EXPERIMENTS AS BOXES ---
