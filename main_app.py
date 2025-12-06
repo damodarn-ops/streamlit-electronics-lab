@@ -97,6 +97,7 @@ st.markdown("<p class='welcome-text'>Click on an experiment below to run it.</p>
 
 # --- EXPERIMENTS (Map to page names) ---
 experiments = {
+    "Info": "Info",
     "Basic Op-Amp Simulator": "Basic_Op_Amp_Simulator",
     "Integrator / Differentiator": "Integrator_Differentiator",
     "Precision Rectifier": "Precision_Rectifier",
@@ -107,7 +108,6 @@ experiments = {
     "Wien Bridge Oscillator": "Wien_Bridge_Oscillator",
     "Square Wave Generator": "Square_Wave_Generator",
     "Active Filter": "Active_Filter",
-    "Info": "Info",
     "Feedback": "Feedback"
 }
 
