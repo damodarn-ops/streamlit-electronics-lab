@@ -434,8 +434,8 @@ with tab4:
     ax1.tick_params(axis='x', colors='black')
     ax1.tick_params(axis='y', colors='black')
     ax1.set_title("Input Waveform (Ch 1)", color='white')
-    ax1.set_xlabel("Time")
-    ax1.set_ylabel("Input voltage(v)")
+    ax1.set_xlabel("Time (sec)")
+    ax1.set_ylabel("Voltage (V)")
     if amplitude != 0:
         ax1.text(0.02, 0.95, f'Amplitude: {amplitude:.2f} V', transform=ax1.transAxes, 
                   fontsize=9, color='white', verticalalignment='top')
@@ -456,8 +456,8 @@ with tab4:
     ax2.tick_params(axis='x', colors='black')
     ax2.tick_params(axis='y', colors='black')
     ax2.set_title("Output Waveform (Ch 2)", color='white')
-    ax2.set_xlabel("Time")
-    ax2.set_ylabel("Input voltage(v)")
+    ax2.set_xlabel("Time (sec)")
+    ax2.set_ylabel("Voltage (V)")
 
     amplitude_display_text = f'Amplitude: {output_amplitude:.2f} V'
     if abs(output_amplitude - CLIPPING_LIMIT) < 0.01 and amplitude > 0:
@@ -486,8 +486,8 @@ with tab4:
     ax_combined.tick_params(axis='y', colors='black')
     ax_combined.set_title("Combined Waveform", color='white')
     ax_combined.legend(loc='upper right', facecolor='darkgray', edgecolor='white', fontsize=8)
-    ax_combined.set_xlabel("Time")
-    ax_combined.set_ylabel("Input voltage(v)")
+    ax_combined.set_xlabel("Time (sec)")
+    ax_combined.set_ylabel("Voltage (V)")
     
     with plot_col3: # Display fig_combined in the third plot column
         st.pyplot(fig_combined)

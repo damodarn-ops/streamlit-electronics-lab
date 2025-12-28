@@ -21,7 +21,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Objective", "Prelab", "Theory", "
 
 mcq_questions = [
     {
-        "question":("What is the primary function of the RC circuit (RF and C) in this generator?"),
+        "question":("What is the primary function of the RC circuit ($R_F$ and C) in this generator?"),
             "options": [
                 "Filter the output signal to produce a pure sine wave.",
     "Provide a time-dependent voltage for the inverting input ($V_{in-}$), which dictates the switching points.",
@@ -77,6 +77,44 @@ mcq_questions = [
             "explanation":"The oscillation **frequency ($f$)** is inversely proportional to the **time constant** $\\tau = R_F C$. The formula for the frequency is $f = \\frac{1}{2 R_F C \\ln(1 + 2R_2/R_1)}$. To **decrease** the frequency (i.e., increase the period), you must **increase** the time constant $\\tau$, which means increasing $R_F$ or $C$."
             }
     ]
+
+mcq_questions1 = [
+    {
+     "question":"Square wave generator is also known as:",
+     "options": [  "RC oscillator", "Relaxation oscillator", "LC oscillator", "Crystal oscillator" ],
+     "correct_option_index": 1,
+     "explanation":"It is called a relaxation oscillator because it relies on capacitor charging and discharging to generate oscillations."
+     
+     
+     },
+    {
+     "question":"Main principle in square wave generator:",
+     "options": ["Negative feedback", "Positive feedback with RC charging", "Phase shift", "LC resonance"   ],
+     "correct_option_index": 1,
+     "explanation":"Positive feedback with capacitor charging/discharging creates the oscillation needed for square waves."
+     
+     },
+    {
+     "question":"Output frequency in square wave generator depends on",
+     "options": ["R only", "C only", "Both R and C", "Supply voltage"   ],
+     "correct_option_index": 2,
+     "explanation":"Frequency is determined by the RC time constant of the charging-discharging circuit."
+     },
+    {
+     "question":"Increasing resistance in square wave generator will",
+     "options": [ "Decrease frequency", "Increase frequency", "Stop output", "No change"],
+     "correct_option_index": 0,
+     "explanation":"Increasing Resistance increases the time constant, reducing oscillation frequency" 
+     },
+    {
+     "question":"Duty cycle for ideal square wave:",
+     "options": ["25%", "75%", "100%" , "50%" ],
+     "correct_option_index": 3,
+     "explanation":"An ideal square wave has equal high and low times, so duty cycle is 50%"
+     }
+    ]
+
+
 with tab1:
     
     st.markdown("""
@@ -99,25 +137,39 @@ with tab2:
     st.text_input("Your Name",key="p1")
     user_answers = {}
     for i, mcq in enumerate(mcq_questions):
-       user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+       question_number = i + 1  # Calculates the question number starting from 1
+     # Display the question with the number prepended
+       question_prompt = f"**Question {question_number}**: {mcq['question']}"
+       
+       # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+       user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcqp_{i}")
 
-    if st.button("Submit Answers", key="submit_mcq"):
+    if st.button("Submit Answers", key="submit_mcq1"):
        st.subheader("Results")
+       # Initialize score variables
+       correct_count = 0
+       total_questions = len(mcq_questions)
+       
        all_correct = True
        for i, mcq in enumerate(mcq_questions):
            correct_answer = mcq["options"][mcq["correct_option_index"]]
            if user_answers[i] == correct_answer:
                st.success(f"**Question {i+1}: Correct!** ✅")
                st.markdown(f"**Explanation:** {mcq['explanation']}")
+               correct_count += 1  # Increment the score
            else:
                st.error(f"**Question {i+1}: Incorrect.** ❌")
                st.markdown(f"**Correct Answer:** {correct_answer}")
                st.markdown(f"**Explanation:** {mcq['explanation']}")
                all_correct = False
+       # Display the final score immediately after the per-question results
+       st.markdown("---")
+       st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+       st.markdown("---")
        
        if all_correct:
            st.balloons()
-           st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
+           st.info("You've answered all questions correctly! . 🎉")
        else:
            st.warning("Please review the theory and try again. 🤔")
 
@@ -132,13 +184,21 @@ with tab3:
 
     1.  **Capacitor Charging:** When the output is at $+V_{sat}$, the capacitor C charges through the feedback resistor $R_F$. The voltage across the capacitor, $V_C$, increases exponentially towards $+V_{sat}$.
     2.  **Comparator Action:** The voltage at the non-inverting input ($V_+$) is a fraction of the output voltage, determined by the voltage divider $R_1$ and $R_2$. The threshold voltage for the comparator is given by:
-        $$V_{threshold} = \beta \times V_{out} = \frac{R_2}{R_1 + R_2} \times V_{out}$$
+       
+        
+    $$V_{threshold} = \beta \times V_{out} = \frac{R_2}{R_1 + R_2} \times V_{out}$$
+    
     3.  **State Change:** When the capacitor's voltage ($V_C$) exceeds the positive threshold voltage at the non-inverting input, the op-amp's output flips from $+V_{sat}$ to $-V_{sat}$. The capacitor then begins to discharge towards $-V_{sat}$.
+    
     4.  **Reverse State Change:** When the capacitor's voltage falls below the negative threshold voltage ($-V_{threshold}$), the op-amp's output flips back to $+V_{sat}$, and the cycle repeats.
 
     ### Period and Frequency
     The period ($T$) of the square wave is determined by the time it takes for the capacitor to charge and discharge between the positive and negative threshold voltages. For a symmetric output, the period is given by:
+    
+        
     $$T = 2 R_F C \ln\left(1 + \frac{2R_2}{R_1}\right)$$
+    
+    
     The frequency ($f$) is the reciprocal of the period:
     $$f = \frac{1}{T}$$
     """)
@@ -153,11 +213,11 @@ with tab4:
     
         # Number input for Feedback Resistance (RF) in kΩ.
         RF_kohm = st.number_input(
-            "Feedback Resistance (RF) (kΩ)",
+            "Feedback Resistance ($R_F$) (kΩ)",
             min_value=0.001,
             value=10.0,
             step=0.1,
-            format="%.3f",
+            format="%.2f",
             key="RF_input_sq_wave"
         )
     
@@ -167,32 +227,31 @@ with tab4:
             min_value=0.0001,
             value=0.1,
             step=0.001,
-            format="%.5f",
+            format="%.3f",
             key="C_input_sq_wave"
         )
     
         # Number input for Resistance R1 (part of voltage divider for thresholds) in kΩ.
         R1_kohm = st.number_input(
-            "Resistance (R1) (kΩ)",
+            "Resistance ($R_1$) (kΩ)",
             min_value=0.001,
             value=10.0,
             step=0.1,
-            format="%.3f",
+            format="%.2f",
             key="R1_input_sq_wave"
         )
     
         # Number input for Resistance R2 (part of voltage divider for thresholds) in kΩ.
         R2_kohm = st.number_input(
-            "Resistance (R2) (kΩ)",
+            "Resistance ($R_2$) (kΩ)",
             min_value=0.001,
             value=10.0,
             step=0.1,
-            format="%.3f",
+            format="%.2f",
             key="R2_input_sq_wave"
         )
     
-        st.markdown("---")
-        st.write("Developed by DAMODAR")
+       
 
     # --- Core Simulation Logic ---
     def calculate_square_wave_parameters(RF_kohm, C_uF, R1_kohm, R2_kohm):
@@ -261,6 +320,9 @@ with tab4:
             num_points = int(sampling_rate * total_duration)
             if num_points < 2: num_points = 2
             t_time = np.linspace(0, total_duration, num_points, endpoint=False)
+            T=T*1000;
+            T_on=T_on*1000
+            T_off=T_off*1000
             y_signal = amp * signal.square(2 * np.pi * freq * t_time)
     
         return {
@@ -281,19 +343,32 @@ with tab4:
 
     # --- CRO Display and Simulation Results ---
     with col2:
+        st.header("Calculated Values")
+# 3. RUN THE CALCULATION (Crucial step - must be after inputs, but before outputs)
+        sim_results = calculate_square_wave_parameters(RF_kohm, C_uF, R1_kohm, R2_kohm)
+# st.metric requires: label, value (formatted as a string if you want decimals)
+        st.metric(
+          label="Calculated Frequency (f)",
+          value=f"{sim_results['Frequency_Hz']:.2f} Hz"
+         )
+        
+        
+        
         st.header("Circuit Diagram")
         
         st.image("images/squarewavegenerator.png", caption="Square Wave Generator Circuit", width='stretch')
         
-        st.subheader("CRO Display")
-        st.text_input("Your Name",key="p2")
-        sim_results = calculate_square_wave_parameters(RF_kohm, C_uF, R1_kohm, R2_kohm)
+    st.subheader("CRO Display")
+    st.text_input("Your Name",key="p2")
+    sim_results = calculate_square_wave_parameters(RF_kohm, C_uF, R1_kohm, R2_kohm)
     
-        if sim_results is not None:
+    if sim_results is not None:
             fig1, ax1 = plt.subplots(figsize=(6, 3), dpi=100)
-            ax1.plot(sim_results["t_time"], sim_results["y_signal"], color='red')
-            ax1.set_title(f"Output Signal\nFrequency: {sim_results['Frequency_Hz']:.2f} Hz, Period: {sim_results['Period_s']:.2e} s")
-            ax1.set_xlabel("Time (s)")
+            time_ms = sim_results["t_time"] * 1000
+            total_duration_ms = sim_results["Total_Duration_s"] * 1000
+            ax1.plot(time_ms, sim_results["y_signal"], color='red')
+            ax1.set_title(f"Output Signal\nFrequency: {sim_results['Frequency_Hz']:.2f} Hz, Period: {sim_results['Period_s']:.2f} ms")
+            ax1.set_xlabel("Time (ms)")
             ax1.set_ylabel("Amplitude (V)")
             ax1.grid(True)
             ax1.set_facecolor("black")
@@ -302,9 +377,9 @@ with tab4:
             
             plot_ylim = sim_results["Output_Amplitude_V"] * 1.1 if sim_results["Output_Amplitude_V"] != 0 else 1.0
             ax1.set_ylim(-plot_ylim, plot_ylim)
-            ax1.set_xlim(0, sim_results["Total_Duration_s"])
-            ax1.tick_params(axis='x', colors='white')
-            ax1.tick_params(axis='y', colors='white')
+            ax1.set_xlim(0, total_duration_ms)
+            ax1.tick_params(axis='x', colors='black')
+            ax1.tick_params(axis='y', colors='black')
             
             ax1.text(0.02, 0.95, f'Amp: {sim_results["Output_Amplitude_V"]:.2f} V', transform=ax1.transAxes,
                       fontsize=8, color='white', verticalalignment='top')
@@ -318,23 +393,23 @@ with tab4:
                 st.session_state.square_wave_history = []
     
     if st.button("Log Current Results to Table", key="log_button_sq_wave"):
-                new_entry = {
-                    "RF (kΩ)": f"{sim_results['RF_kohm']:.2f}",
-                    "C (µF)": f"{sim_results['C_uF']:.2f}",
-                    "R1 (kΩ)": f"{sim_results['R1_kohm']:.2f}",
-                    "R2 (kΩ)": f"{sim_results['R2_kohm']:.2f}",
-                    "Period (T) (s)": f"{sim_results['Period_s']:.2e}",
-                    "T_on (s)": f"{sim_results['T_on_s']:.2e}",
-                    "T_off (s)": f"{sim_results['T_off_s']:.2e}",
-                    "Amplitude (V)": f"{sim_results['Output_Amplitude_V']:.2f}",
-                    "Duration (s)": f"{sim_results['Total_Duration_s']:.2e}",
-                    "C_Amp (V)": f"{sim_results['Capacitor_Threshold_V']:.2f}"
-                }
-                st.session_state.square_wave_history.append(new_entry)
+               new_entry = {
+    "$R_f$ (kΩ)": f"{sim_results['RF_kohm']:.2f}",
+    "C (µF)": f"{sim_results['C_uF']:.2f}",
+    "$R_1$ (kΩ)": f"{sim_results['R1_kohm']:.2f}",
+    "$R_2$ (kΩ)": f"{sim_results['R2_kohm']:.2f}",
+    "Period (T) (ms)": f"{sim_results['Period_s']:.2f}",
+    "$T_{on}$ (ms)": f"{sim_results['T_on_s']:.2f}",
+    "$T_{off}$ (ms)": f"{sim_results['T_off_s']:.2f}",
+    "Amplitude (V)": f"{sim_results['Output_Amplitude_V']:.2f}",
+    "Duration (s)": f"{sim_results['Total_Duration_s']:.2f}",
+    "Voltage across C (V)": f"{sim_results['Capacitor_Threshold_V']:.2f}"
+    }
+               st.session_state.square_wave_history.append(new_entry)
     
     if st.session_state.square_wave_history:
                 df_history = pd.DataFrame(st.session_state.square_wave_history)
-                st.dataframe(df_history, width='stretch')
+                st.table(df_history)
     
     if st.button("Clear Table History", key="clear_table_button_sq_wave"):
                 st.session_state.square_wave_history = []
@@ -346,21 +421,43 @@ with tab4:
 with tab5:
     st.header("Postlab")
     st.text_input("Your Name",key="p3")
-    st.subheader("Conclusion:")
-    st.write(" Summarize your observations from the simulation regarding the effect of changing RF, C, R1, and R2 on the output frequency and amplitude.")
-    st.text_area("Your Answer ", height=100, key="postlab_q1")
-    st.write(" Explain why this circuit is often called a free-running or astable multivibrator.")
-    st.text_area("Your Answer ", height=100, key="postlab_q2")
-    st.write(" What would happen if the capacitor C was replaced by a short circuit? Explain the outcome.")
-    st.text_area("Your Answer ", height=100, key="postlab_q3")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions1):
+        question_number = i + 1  # Calculates the question number starting from 1
+      # Display the question with the number prepended
+        question_prompt = f"**Question {question_number}**: {mcq['question']}"
+        
+        # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+        user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcq_{i}")
 
-    st.subheader("Analysis:")
-    st.write(" Using the formula, calculate the period and frequency of the square wave if $R_F = 20k\Omega$, $C = 0.05\mu F$, $R_1 = 10k\Omega$, and $R_2 = 10k\Omega$.")
-    st.text_area("Your Answer ", height=100, key="postlab_q4")
-    st.write(" If you wanted to double the frequency of the output, what simple change could you make to the circuit's components?")
-    st.text_area("Your Answer ", height=100, key="postlab_q5")
-    st.write("How does the output amplitude of the square wave relate to the op-amp's power supply?")
-    st.text_area("Your Answer ", height=100, key="postlab_q6")
+    if st.button("Submit Answers", key="submit_mcq"):
+        st.subheader("Results")
+        # Initialize score variables
+        correct_count = 0
+        total_questions = len(mcq_questions1)
+        
+        all_correct = True
+        for i, mcq in enumerate(mcq_questions1):
+            correct_answer = mcq["options"][mcq["correct_option_index"]]
+            if user_answers[i] == correct_answer:
+                st.success(f"**Question {i+1}: Correct!** ✅")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                correct_count += 1  # Increment the score
+            else:
+                st.error(f"**Question {i+1}: Incorrect.** ❌")
+                st.markdown(f"**Correct Answer:** {correct_answer}")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                all_correct = False
+        # Display the final score immediately after the per-question results
+        st.markdown("---")
+        st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+        st.markdown("---")
+        
+        if all_correct:
+            st.balloons()
+            st.info("You've answered all questions correctly! . 🎉")
+        else:
+            st.warning("Please review the theory and try again. 🤔")
 
 # --- Feedback Tab ---
 with tab6:

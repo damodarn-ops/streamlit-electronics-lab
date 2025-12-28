@@ -22,38 +22,77 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Objective", "Prelab", "Theory", "
 # Define the MCQs and answers
 mcq_questions = [
     {
-        "question": "1. The primary difference between an active and passive filter is the use of:",
+        "question": " The primary difference between an active and passive filter is the use of:",
         "options": ["Resistors only", "Capacitors only", "An active component like an op-amp", "Inductors only"],
         "answer_index": 2,
         "explanation": "Active filters use active components (like op-amps or transistors) to provide gain and buffering, while passive filters only use passive components (resistors, capacitors, inductors)."
     },
     {
-        "question": "2. A key advantage of an active filter is that it can:",
+        "question": " A key advantage of an active filter is that it can:",
         "options": ["Only attenuate signals", "Provide signal gain", "Only be used for low frequencies", "Work without a power supply"],
         "answer_index": 1,
         "explanation": "Active filters, unlike passive filters, can provide voltage gain in the passband, amplifying the signal."
     },
     {
-        "question": "3. The cutoff frequency ($f_c$) of a first-order RC filter is determined by the values of:",
+        "question": " The cutoff frequency ($f_c$) of a first-order RC filter is determined by the values of:",
         "options": ["Resistance and Inductance", "Capacitance and Inductance", "Resistance and Capacitance", "Voltage and Current"],
         "answer_index": 2,
         "explanation": "The cutoff frequency for an RC filter is directly dependent on the values of the resistor (R) and capacitor (C), calculated as $f_c = \\frac{1}{2\\pi RC}$."
     },
     # --- New MCQ 4 ---
     {
-        "question": "4. The primary role of the Op-Amp in a first-order active filter is to:",
+        "question": " The primary role of the Op-Amp in a first-order active filter is to:",
         "options": ["Set the cutoff frequency.", "Act as a current sink.", "Provide gain and isolate the filter stage from the load.", "Serve as the passive RC component."],
         "answer_index": 2,
         "explanation": "The op-amp provides voltage gain in the passband and, most importantly, acts as a buffer (isolating the filter stage from the next stage/load), which prevents the load from affecting the filter's characteristic frequency."
     },
     # --- New MCQ 5 ---
     {
-        "question": "5. The voltage gain ($A_v$) for the non-inverting op-amp configuration used in many active filters is given by the formula:",
+        "question": " The voltage gain ($A_v$) for the non-inverting op-amp configuration used in many active filters is given by the formula:",
         "options": ["$A_v = -\\frac{R_f}{R_{in}}$", "$A_v = 1 + \\frac{R_f}{R_{g}}$", "$A_v = \\frac{R_f}{R_{in}}$", "$A_v = 1$"],
         "answer_index": 1,
         "explanation": "The voltage gain of a non-inverting op-amp amplifier is set by the feedback resistor ($R_f$) and the resistor to ground ($R_g$, often called $R_1$ and $R_2$ in the prelab) using the formula $A_v = 1 + \\frac{R_f}{R_{g}}$."
     }
 ]
+
+mcq_questions1 = [
+    {
+     "question":"Low-pass filter allows:",
+     "options": ["High", "Low", "All", "None"   ],
+     "correct_option_index": 1,
+     "explanation":"LPF allows low frequencies to pass while attenuating high frequencies."
+     
+     
+     },
+    {
+     "question":"At cut-off frequency, output becomes:",
+     "options": ["Zero", "Max", "0.707 times", "2 times"  ],
+     "correct_option_index": 2,
+     "explanation":"At cut-off frequency, output drops to 1/√2 (~0.707) of maximum."
+     
+     },
+    {
+     "question":"Cut-off frequency formula of first order LPF:",
+     "options": ["$1/RC$", "$1/2πRC$", "πRC", "2πRC" ],
+     "correct_option_index": 1,
+     "explanation":"The cut-off frequency for a first-order RC filter is $f_c$ = $1/(2πRC)$."
+     },
+    {
+     "question":"Roll-off rate of first order HPF",
+     "options": ["+20 dB/dec", "-20 dB/dec", "0 dB/dec", "-40 dB/dec"  ],
+     "correct_option_index": 0,
+     "explanation":"HPF has a +20 dB/decade slope below the cut-off frequency." 
+     },
+    {
+     "question":"Phase shift at fc (HPF):",
+     "options": [ "0°", "+45°", "-45°", "90°"   ],
+     "correct_option_index": 1,
+     "explanation":"At cut-off, HPF introduces a phase shift of +45°."
+     }
+    ]
+
+
+
 
 with tab1:
     
@@ -77,27 +116,41 @@ with tab2:
     st.text_input("Your Name",key="p1")
     user_answers = {}
     for i, mcq in enumerate(mcq_questions):
-        user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+       question_number = i + 1  # Calculates the question number starting from 1
+     # Display the question with the number prepended
+       question_prompt = f"**Question {question_number}**: {mcq['question']}"
+       
+       # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+       user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcqp_{i}")
 
-    if st.button("Submit Answers", key="submit_mcq"):
-        st.subheader("Results")
-        all_correct = True
-        for i, mcq in enumerate(mcq_questions):
-            correct_answer = mcq["options"][mcq["answer_index"]]
-            if user_answers[i] == correct_answer:
-                st.success(f"**Question {i+1}: Correct!** ✅")
-                st.markdown(f"**Explanation:** {mcq['explanation']}")
-            else:
-                st.error(f"**Question {i+1}: Incorrect.** ❌")
-                st.markdown(f"**Correct Answer:** {correct_answer}")
-                st.markdown(f"**Explanation:** {mcq['explanation']}")
-                all_correct = False
-        
-        if all_correct:
-            st.balloons()
-            st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
-        else:
-            st.warning("Please review the theory and try again. 🤔")
+    if st.button("Submit Answers", key="submit_mcq1"):
+       st.subheader("Results")
+       # Initialize score variables
+       correct_count = 0
+       total_questions = len(mcq_questions)
+       
+       all_correct = True
+       for i, mcq in enumerate(mcq_questions):
+           correct_answer = mcq["options"][mcq["correct_option_index"]]
+           if user_answers[i] == correct_answer:
+               st.success(f"**Question {i+1}: Correct!** ✅")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               correct_count += 1  # Increment the score
+           else:
+               st.error(f"**Question {i+1}: Incorrect.** ❌")
+               st.markdown(f"**Correct Answer:** {correct_answer}")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               all_correct = False
+       # Display the final score immediately after the per-question results
+       st.markdown("---")
+       st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+       st.markdown("---")
+       
+       if all_correct:
+           st.balloons()
+           st.info("You've answered all questions correctly! . 🎉")
+       else:
+           st.warning("Please review the theory and try again. 🤔")
 
 
 # --- Theory Tab ---
@@ -111,7 +164,9 @@ with tab3:
     A low-pass filter allows low-frequency signals to pass through while attenuating high-frequency signals.
     
     * **Cutoff Frequency ($f_c$):** The frequency at which the output power is half of the input power, or the gain is attenuated by 3 dB.
-        $$f_c = \frac{1}{2 \pi R C}$$
+       
+    
+    $$f_c = \frac{1}{2 \pi R C}$$
     * **Passband Gain ($A_v$):** The gain of the filter at frequencies below the cutoff.
         $$A_v = 1 + \frac{R_F}{R_1}$$
 
@@ -122,6 +177,8 @@ with tab3:
         $$f_c = \frac{1}{2 \pi R C}$$
     * **Passband Gain ($A_v$):** The gain of the filter at frequencies above the cutoff.
         $$A_v = 1 + \frac{R_F}{R_1}$$
+        
+     $$A_v(dB) =20*log(A_v)$$
     """)
 
 # --- Simulation Tab ---
@@ -174,7 +231,7 @@ with tab4:
         selected_filter_type_int = filter_type_map[filter_type]
 
         R1_kohm = st.number_input(
-            "R1 (kΩ) (Gain Resistor)",
+            "$R_1$ (kΩ) (Gain Resistor)",
             min_value=0.001,
             value=10.0,
             step=0.1,
@@ -182,7 +239,7 @@ with tab4:
             key="R1_input_filter"
         )
         RF_kohm = st.number_input(
-            "RF (kΩ) (Feedback Resistor)",
+            "$R_f$ (kΩ) (Feedback Resistor)",
             min_value=0.001,
             value=10.0,
             step=0.1,
@@ -206,8 +263,7 @@ with tab4:
             key="R_input_filter"
         )
 
-        st.markdown("---")
-        st.write("Developed by DAMODAR")
+      
 
     # --- Core Simulation Logic ---
     def generate_waveform(amp, freq, wave_type_val, num_cycles=3):
@@ -318,6 +374,28 @@ with tab4:
 
     # --- CRO Displays and Plotting ---
     with col3:
+        (y_input, y_output, t, amp_input_actual, total_duration, input_freq, 
+ output_amplitude, gain_vv, gain_db, filter_name, plot_ylim_output, 
+ amplitude_display_text, fc) = simulate_filter_circuit(
+    amplitude, actual_frequency, selected_wave_type_int,
+    selected_filter_type_int, R1_kohm, RF_kohm, C_uF, R_kohm
+)
+        # Helper function to format frequency for the metric
+        def format_freq(f):
+         if f >= 1e6: return f"{f/1e6:.2f} MHz"
+         if f >= 1e3: return f"{f/1e3:.2f} kHz"
+         return f"{f:.2f} Hz"
+     
+       
+        st.header("Calculated Values")
+        st.metric(
+          label="Cutoff Frequency ($f_c$)", 
+            value=format_freq(fc)
+         )
+        gain_display = f"{gain_db:.2f} dB" if gain_db != -float('inf') else "-∞ dB"
+        st.metric(
+           label="Calculated Gain", value=gain_display
+           )
         st.header(" Circuit Diagram")
         
         if filter_type == "Lowpass Filter":
@@ -347,9 +425,11 @@ with tab4:
     ax1.set_ylim(-max_plot_amp_input, max_plot_amp_input)
         
     ax1.set_xlim(0, total_duration)
-    ax1.tick_params(axis='x', colors='white')
-    ax1.tick_params(axis='y', colors='white')
-    ax1.set_title("Ch 1: Input Signal", color='white', fontsize=10)
+    ax1.tick_params(axis='x', colors='black')
+    ax1.tick_params(axis='y', colors='black')
+    ax1.set_xlabel("Time (ms)")
+    ax1.set_ylabel("Amplitude (V)")
+    ax1.set_title("Ch 1: Input Signal", color='black', fontsize=10)
     ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
     with plot_col1:    st.pyplot(fig1)
@@ -359,12 +439,15 @@ with tab4:
     ax2.set_facecolor("black")
     ax2.axhline(0, color='gray', linewidth=0.5)
     ax2.axvline(0, color='gray', linewidth=0.5)
-        
-    ax2.set_ylim(-plot_ylim_output, plot_ylim_output)
+    current_max = np.max(np.abs(y_output))
+    dynamic_ylim = (current_max * 1.5) if current_max > 0 else 1.0
+    ax2.set_ylim(-dynamic_ylim, dynamic_ylim)
     ax2.set_xlim(0, total_duration)
-    ax2.tick_params(axis='x', colors='white')
-    ax2.tick_params(axis='y', colors='white')
-    ax2.set_title("Ch 2: Output Signal", color='white', fontsize=10)
+    ax2.tick_params(axis='x', colors='black')
+    ax2.tick_params(axis='y', colors='black')
+    ax2.set_xlabel("Time (ms)")
+    ax2.set_ylabel("Amplitude (V)")
+    ax2.set_title("Ch 2: Output Signal", color='black', fontsize=10)
     ax2.text(0.02, 0.95, amplitude_display_text, transform=ax2.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
     with plot_col2:    st.pyplot(fig2)
@@ -417,11 +500,11 @@ with tab4:
             gains_db_plot = [d[1] for d in sorted_data]
 
             ax_semilog.semilogx(frequencies_plot, gains_db_plot, 'o-', color='yellow')
-            ax_semilog.set_xlabel("Frequency (Hz)", color='white')
-            ax_semilog.set_ylabel("Gain (dB)", color='white')
+            ax_semilog.set_xlabel("Frequency (Hz)", color='black')
+            ax_semilog.set_ylabel("Gain (dB)", color='black')
             ax_semilog.set_title("Frequency Response (Gain vs. Frequency)", color='white', fontsize=10)
-            ax_semilog.tick_params(axis='x', colors='white')
-            ax_semilog.tick_params(axis='y', colors='white')
+            ax_semilog.tick_params(axis='x', colors='black')
+            ax_semilog.tick_params(axis='y', colors='black')
             ax_semilog.grid(True, which="both", ls="-", color='gray', alpha=0.5)
             
             if fc > 0 and not np.isinf(fc) and not np.isnan(fc):
@@ -452,21 +535,43 @@ with tab4:
 with tab5:
     st.header("Postlab: Analysis and Conclusion")
     st.text_input("Your Name",key="p3")
-    st.subheader("Conclusion:")
-    st.write(" Based on your simulation, describe how the output signal changes as the input frequency varies for both the low-pass and high-pass filter configurations.")
-    st.text_area("Your Answer ", height=100, key="postlab_q1")
-    st.write(" How did the simulated gain (in dB) change in relation to the cutoff frequency? Was this what you expected?")
-    st.text_area("Your Answer ", height=100, key="postlab_q2")
-    st.write(" Explain the significance of the cutoff frequency ($f_c$) for each filter type.")
-    st.text_area("Your Answer ", height=100, key="postlab_q3")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions1):
+        question_number = i + 1  # Calculates the question number starting from 1
+      # Display the question with the number prepended
+        question_prompt = f"**Question {question_number}**: {mcq['question']}"
+        
+        # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+        user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcq_{i}")
 
-    st.subheader("Analysis:")
-    st.write("If you set $R = 15k\Omega$ and $C = 0.05\mu F$, what is the theoretical cutoff frequency?")
-    st.text_area("Your Answer ", height=100, key="postlab_q4")
-    st.write(" Calculate the gain in dB if $R_F = 20k\Omega$ and $R_1 = 5k\Omega$.")
-    st.text_area("Your Answer ", height=100, key="postlab_q5")
-    st.write(" How would you modify a low-pass filter to pass only frequencies below 100 Hz?")
-    st.text_area("Your Answer ", height=100, key="postlab_q6")
+    if st.button("Submit Answers", key="submit_mcq"):
+        st.subheader("Results")
+        # Initialize score variables
+        correct_count = 0
+        total_questions = len(mcq_questions1)
+        
+        all_correct = True
+        for i, mcq in enumerate(mcq_questions1):
+            correct_answer = mcq["options"][mcq["correct_option_index"]]
+            if user_answers[i] == correct_answer:
+                st.success(f"**Question {i+1}: Correct!** ✅")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                correct_count += 1  # Increment the score
+            else:
+                st.error(f"**Question {i+1}: Incorrect.** ❌")
+                st.markdown(f"**Correct Answer:** {correct_answer}")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                all_correct = False
+        # Display the final score immediately after the per-question results
+        st.markdown("---")
+        st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+        st.markdown("---")
+        
+        if all_correct:
+            st.balloons()
+            st.info("You've answered all questions correctly! . 🎉")
+        else:
+            st.warning("Please review the theory and try again. 🤔")
 
 # --- Feedback Tab ---
 with tab6:

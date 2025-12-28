@@ -78,6 +78,45 @@ mcq_questions = [
 }
 
     ]
+
+mcq_questions1 = [
+    {
+     "question":"What is the main purpose of a Schmitt Trigger circuit?",
+     "options": ["Amplify weak signals", "Convert AC to DC", "Remove noise from input signals", "Generate sine waves"],
+     "correct_option_index": 2,
+     "explanation":"Schmitt trigger removes noise by introducing hysteresis which converts noisy input into clean digital transitions."
+     
+     
+     },
+    {
+     "question":"What type of feedback is used in a Schmitt Trigger?",
+     "options": [  "Negative feedback", "Positive feedback", "No feedback", "Current feedback" ],
+     "correct_option_index": 1,
+     "explanation":"Positive feedback is used to create two different threshold voltages causing hysteresis"
+     
+     },
+    {
+     "question":"Hysteresis is the:",
+     "options": [ "Difference between threshold voltages", "Gain of op-amp", "Offset voltage", "Output voltage"  ],
+     "correct_option_index": 0,
+     "explanation":"Hysteresis is the voltage difference between upper and lower threshold levels."
+     },
+    {
+     "question":"Which improves due to Schmitt Trigger?",
+     "options": [ "Voltage gain", "Bandwidth", "Power dissipation","Noise immunity"  ],
+     "correct_option_index": 3,
+     "explanation":"Noise margin is improved due to hysteresis effect." 
+     },
+    {
+     "question":"When Vin exceeds upper threshold, output:",
+     "options": ["Becomes zero", "Remains same", "Switches state", "Oscillates"],
+     "correct_option_index": 2,
+     "explanation":"Once Vin crosses threshold, op-amp output saturates to opposite rail."
+     }
+    ]
+
+
+
 with tab1:
 
     
@@ -100,25 +139,39 @@ with tab2:
     st.text_input("Your Name",key="p1")
     user_answers = {}
     for i, mcq in enumerate(mcq_questions):
-       user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+       question_number = i + 1  # Calculates the question number starting from 1
+     # Display the question with the number prepended
+       question_prompt = f"**Question {question_number}**: {mcq['question']}"
+       
+       # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+       user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcqp_{i}")
 
-    if st.button("Submit Answers", key="submit_mcq"):
+    if st.button("Submit Answers", key="submit_mcq1"):
        st.subheader("Results")
+       # Initialize score variables
+       correct_count = 0
+       total_questions = len(mcq_questions)
+       
        all_correct = True
        for i, mcq in enumerate(mcq_questions):
            correct_answer = mcq["options"][mcq["correct_option_index"]]
            if user_answers[i] == correct_answer:
                st.success(f"**Question {i+1}: Correct!** ✅")
                st.markdown(f"**Explanation:** {mcq['explanation']}")
+               correct_count += 1  # Increment the score
            else:
                st.error(f"**Question {i+1}: Incorrect.** ❌")
                st.markdown(f"**Correct Answer:** {correct_answer}")
                st.markdown(f"**Explanation:** {mcq['explanation']}")
                all_correct = False
+       # Display the final score immediately after the per-question results
+       st.markdown("---")
+       st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+       st.markdown("---")
        
        if all_correct:
            st.balloons()
-           st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
+           st.info("You've answered all questions correctly! . 🎉")
        else:
            st.warning("Please review the theory and try again. 🤔")
 
@@ -135,7 +188,7 @@ with tab3:
     #with st.expander("Show Theory Tab Content"):
     st.header("Theory")
     st.markdown(r"""
-    A **Schmitt Trigger** is a comparator with **positive feedback**. This feedback creates two different threshold voltages for the input: an **Upper Threshold Point (V_UTP)** and a **Lower Threshold Point (V_LTP)**. The output state of the Schmitt Trigger depends not only on the current input voltage but also on the previous output state. This two-threshold behavior is known as **hysteresis**.
+    A **Schmitt Trigger** is a comparator with **positive feedback**. This feedback creates two different threshold voltages for the input: an **Upper Threshold Point ($V_{UTP}$)** and a **Lower Threshold Point ($V_{LTP}$)**. The output state of the Schmitt Trigger depends not only on the current input voltage but also on the previous output state. This two-threshold behavior is known as **hysteresis**.
 
     ### How Hysteresis Works
 
@@ -143,21 +196,23 @@ with tab3:
 
     ***
 
-    ### Circuit Operation (Non-Inverting Configuration)
+    ### Circuit Operation 
 
-    In a non-inverting Schmitt Trigger, the input signal is applied to the non-inverting (+) terminal, and the positive feedback loop is created by connecting a resistor (**R1**) from the output to the non-inverting input, and another resistor (**R2**) from the non-inverting input to ground.
+    In a Schmitt Trigger, the input signal is applied to the inverting (-) terminal, and the positive feedback loop is created by connecting a resistor (**$R_1$**) from the output to the non-inverting input, and another resistor (**$R_2$**) from the non-inverting input to ground.
 
     """)
     st.image("images/schmitttrigger.png", caption="Schmitt Trigger Circuit", width='stretch')
     st.markdown(r"""
 
-    The threshold voltages are determined by the resistance values (R1 and R2) and the op-amp's saturation voltages ($V_{sat+}$ and $V_{sat-}$):
+    The threshold voltages are determined by the resistance values ($R_1$ and $R_2$) and the op-amp's saturation voltages ($V_{sat+}$ and $V_{sat-}$):
 
-    * **Upper Threshold Point (V_UTP):** This is the voltage at which the input must rise to cause the output to switch from high ($V_{sat+}$) to low ($V_{sat-}$).
-        $$V_{UTP} = V_{sat+} \left( \frac{R2}{R1 + R2} \right)$$
+    * **Upper Threshold Point ($V_{UTP}$):** This is the voltage at which the input must rise to cause the output to switch from high ($V_{sat+}$) to low ($V_{sat-}$).
+    
+    $$V_{UTP} = V_{sat+} \left( \frac{R_2}{R_1 + R_2} \right)$$
 
-    * **Lower Threshold Point (V_LTP):** This is the voltage at which the input must fall to cause the output to switch from low ($V_{sat-}$) to high ($V_{sat+}$).
-        $$V_{LTP} = V_{sat-} \left( \frac{R2}{R1 + R2} \right)$$
+    * **Lower Threshold Point ($V_{LTP}$):** This is the voltage at which the input must fall to cause the output to switch from low ($V_{sat-}$) to high ($V_{sat+}$).
+        
+    $$V_{LTP} = V_{sat-} \left( \frac{R_2}{R_1 + R_2} \right)$$
 
     The **hysteresis width** is the difference between these two thresholds: $H = V_{UTP} - V_{LTP}$. This positive feedback ensures a sharp, clean transition, effectively "de-bouncing" the input signal.
     """)
@@ -209,12 +264,12 @@ with tab4:
 
     with col2:
         st.header("Schmitt Trigger Parameters")
-        st.info("Note: For typical non-inverting Schmitt Trigger, R1 is connected to the output and R2 to ground, with input to the non-inverting terminal. The thresholds are set by R1, R2, and the saturation voltages.")
-        st.markdown("For this simulation, we assume a non-inverting configuration where hysteresis is determined by R1 (feedback) and R2 (input to ground).")
+        st.info("Note: For typical Schmitt Trigger, $R_1$ is connected to the output and $R_2$ to ground. The thresholds are set by $R_1$, $R_2$, and the saturation voltages.")
+        st.markdown("For this simulation, hysteresis is determined by $R_1$ (feedback) and $R_2$ (resistance to ground).")
 
         # Number input for Resistance R1 (feedback resistor).
         R1_val_kohm = st.number_input(
-            "Resistance (R1) (kΩ)",
+            "Resistance ($R_1$) (kΩ)",
             min_value=0.1, # R1 cannot be zero
             value=10.0,
             step=0.1,
@@ -223,7 +278,7 @@ with tab4:
         )
         # Number input for Resistance R2 (resistor to ground from non-inverting input).
         R2_val_kohm = st.number_input(
-            "Resistance (R2) (kΩ)",
+            "Resistance ($R_2$) (kΩ)",
             min_value=0.1, # R2 cannot be zero
             value=0.5,
             step=0.1,
@@ -232,7 +287,7 @@ with tab4:
         )
 
         st.markdown("---") # Horizontal line for visual separation.
-        st.write("R1 >> R2 (for output wave form)")
+        st.write("$R_1$ >> $R_2$ (for output wave form)")
 
 
     # --- Core Simulation Logic ---
@@ -364,9 +419,11 @@ with tab4:
     ax1.set_ylim(-max_plot_amp, max_plot_amp)
         
     ax1.set_xlim(0, total_duration)
-    ax1.tick_params(axis='x', colors='white')
-    ax1.tick_params(axis='y', colors='white')
-    ax1.set_title("Ch 1: Input Signal", color='white', fontsize=10)
+    ax1.tick_params(axis='x', colors='black')
+    ax1.tick_params(axis='y', colors='black')
+    ax1.set_xlabel("Time (sec)")
+    ax1.set_ylabel("Voltage (V)")
+    ax1.set_title("Ch 1: Input Signal", color='black', fontsize=10)
     ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
     with plot_col1:
@@ -383,9 +440,11 @@ with tab4:
     ax2.set_ylim(V_sat_minus * 1.2, V_sat_plus * 1.2)
         
     ax2.set_xlim(0, total_duration)
-    ax2.tick_params(axis='x', colors='white')
-    ax2.tick_params(axis='y', colors='white')
-    ax2.set_title("Ch 2: Output Signal", color='white', fontsize=10)
+    ax2.tick_params(axis='x', colors='black')
+    ax2.tick_params(axis='y', colors='black')
+    ax2.set_xlabel("Time (sec)")
+    ax2.set_ylabel("Voltage (V)")
+    ax2.set_title("Ch 2: Output Signal", color='black', fontsize=10)
     ax2.text(0.02, 0.95, f'Output High: {V_sat_plus:.2f} V', transform=ax2.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
     ax2.text(0.02, 0.85, f'Output Low: {V_sat_minus:.2f} V', transform=ax2.transAxes,
@@ -394,7 +453,7 @@ with tab4:
         st.pyplot(fig2) # Display the Matplotlib figure in Streamlit.
 
         # Plotting for Combined View (Channel 1 & 2).
-    fig_combined, ax_combined = plt.subplots(figsize=(6, 3), dpi=100)
+    fig_combined, ax_combined = plt.subplots(figsize=(3, 2), dpi=100)
     ax_combined.plot(t, y_input, color='lime', label='Input (Ch 1)')
     ax_combined.plot(t, y_output, color='cyan', label='Output (Ch 2)')
     ax_combined.set_facecolor("black")
@@ -411,9 +470,11 @@ with tab4:
     ax_combined.set_ylim(-max_combined_amp, max_combined_amp)
         
     ax_combined.set_xlim(0, total_duration)
-    ax_combined.tick_params(axis='x', colors='white')
-    ax_combined.tick_params(axis='y', colors='white')
-    ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='white', fontsize=10)
+    ax_combined.tick_params(axis='x', colors='black')
+    ax_combined.tick_params(axis='y', colors='black')
+    ax_combined.set_xlabel("Time (sec)")
+    ax_combined.set_ylabel("Voltage (V)")
+    ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='black', fontsize=10)
     ax_combined.legend(loc='upper right', fontsize=8, facecolor='darkgray', edgecolor='white')
     with plot_col3:    
            st.pyplot(fig_combined) # Display the Matplotlib figure in Streamlit.
@@ -421,51 +482,100 @@ with tab4:
     # --- Dynamic Parameters Table ---
     st.header("Simulation Results")
 
-    # Initialize session state for history if it doesn't exist.
+# Initialize session state for history if it doesn't exist.
     if 'simulation_history_schmitt' not in st.session_state: # Unique key for this page's history.
-        st.session_state.simulation_history_schmitt = []
+     st.session_state.simulation_history_schmitt = []
 
-    # Button to log the current result to the table.
+# Button to log the current result to the table.
     if st.button("Log Current Results to Table", key="log_button_schmitt"):
-        new_entry = {
-            "#": len(st.session_state.simulation_history_schmitt) + 1,
-            "R1 (kΩ)": f"{R1_val_kohm:.1f}",
-            "R2 (kΩ)": f"{R2_val_kohm:.1f}",
-            "V_UTP (V)": f"{V_UTP:.2f}",
-            "V_LTP (V)": f"{V_LTP:.2f}"
-        }
-        st.session_state.simulation_history_schmitt.append(new_entry)
+    
+    
+      new_entry = {
+        "#": len(st.session_state.simulation_history_schmitt) + 1,
+        "R1 (kΩ)": f"{R1_val_kohm:.1f}",
+        "R2 (kΩ)": f"{R2_val_kohm:.1f}",
+        "V_UTP (V)": f"{V_UTP:.2f}",
+        "V_LTP (V)": f"{V_LTP:.2f}"
+    }
+      st.session_state.simulation_history_schmitt.append(new_entry)
 
-    # Display the history as a Pandas DataFrame.
+ # Display the table using st.markdown
     if st.session_state.simulation_history_schmitt:
-        df_history = pd.DataFrame(st.session_state.simulation_history_schmitt)
-        st.dataframe(df_history, width='stretch') # use_container_width makes the table responsive.
+     results = st.session_state.simulation_history_schmitt
+   
+   # Redefine the Markdown table header. **FIXED: Matched column count and variable names.**
+     markdown_table = (
+       "| # | **$R_1$ (kΩ)** | **$R_2$ (kΩ)** | **$V_{UTP}$ (V)** | **$V_{LTP}$ (V)** |"
+       "\n| :---: | :---: | :---: | :---: | :---: |" # 5 columns, 5 separators
+   )
+   
+   # Add each logged row to the table string
+     for entry in results:
+      row_str = (
+          f"\n| {entry['#']} "
+          f"| {entry['R1 (kΩ)']} " # **FIXED: Used 'R1 (kΩ)' key from new_entry dictionary.**
+          f"| {entry['R2 (kΩ)']} " # **FIXED: Used 'R2 (kΩ)' key from new_entry dictionary.**
+          f"| {entry['V_UTP (V)']} " # **FIXED: Used 'V_UTP (V)' key from new_entry dictionary.**
+          f"| {entry['V_LTP (V)']} |" # **FIXED: Used 'V_LTP (V)' key from new_entry dictionary.**
+      )
+      markdown_table += row_str
+      
+   # Display the Markdown table (assuming table_placeholder is not defined in this scope,
+   # we'll just use st.markdown directly).
+   # If you had a placeholder, you would use: table_placeholder.markdown(markdown_table)
+     st.markdown(markdown_table) # Display the markdown table
 
-    # Button to clear the table history.
+# Display the history as a Pandas DataFrame.
+    if st.session_state.simulation_history_schmitt:
+     df_history = pd.DataFrame(st.session_state.simulation_history_schmitt)
+    #st.dataframe(df_history, width='stretch', hide_index=True) # use_container_width makes the table responsive.
+
+# Button to clear the table history.
     if st.button("Clear Table History", key="clear_table_button_schmitt"):
-        st.session_state.simulation_history_schmitt = [] # Reset the history list.
-        st.rerun() # Rerun the app to immediately reflect the cleared table.
+      st.session_state.simulation_history_schmitt = [] # Reset the history list.
+      st.rerun() # Rerun the app to immediately reflect the cleared table..
 
 # --- Postlab Tab ---
 with tab5:
     st.header("Postlab")
     st.text_input("Your Name",key="p3")
-    st.subheader("Conclusion:")
-       
-    st.write("Summarize your observations from the simulation, specifically on the relationship between R1, R2, and the threshold voltages.")
-    st.text_area("Your Answer ", height=100, key="postlab_q1")
-    st.write("Explain how the hysteresis loop is visible in the combined input-output graph.")
-    st.text_area("Your Answer ", height=100, key="postlab_q2")
-    st.write(" Discuss the effect of varying the amplitude of the input signal relative to the hysteresis width.")
-    st.text_area("Your Answer ", height=100, key="postlab_q3")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions1):
+        question_number = i + 1  # Calculates the question number starting from 1
+      # Display the question with the number prepended
+        question_prompt = f"**Question {question_number}**: {mcq['question']}"
+        
+        # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+        user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcq_{i}")
 
-    st.subheader("Analysis:")
-    st.write("If R1 = 10 kΩ and R2 = 1 kΩ, calculate the V_UTP and V_LTP values and verify them with the simulation.")
-    st.text_area("Your Answer ", height=100, key="postlab_q4")
-    st.write("What happens to the output if the input signal's peak-to-peak voltage is less than the hysteresis width?")
-    st.text_area("Your Answer ", height=100, key="postlab_q5")
-    st.write("How does the Schmitt Trigger circuit solve the problem of false triggering due to noise in a simple comparator circuit?")
-    st.text_area("Your Answer ", height=100, key="postlab_q6")
+    if st.button("Submit Answers", key="submit_mcq"):
+        st.subheader("Results")
+        # Initialize score variables
+        correct_count = 0
+        total_questions = len(mcq_questions1)
+        
+        all_correct = True
+        for i, mcq in enumerate(mcq_questions1):
+            correct_answer = mcq["options"][mcq["correct_option_index"]]
+            if user_answers[i] == correct_answer:
+                st.success(f"**Question {i+1}: Correct!** ✅")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                correct_count += 1  # Increment the score
+            else:
+                st.error(f"**Question {i+1}: Incorrect.** ❌")
+                st.markdown(f"**Correct Answer:** {correct_answer}")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                all_correct = False
+        # Display the final score immediately after the per-question results
+        st.markdown("---")
+        st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+        st.markdown("---")
+        
+        if all_correct:
+            st.balloons()
+            st.info("You've answered all questions correctly! . 🎉")
+        else:
+            st.warning("Please review the theory and try again. 🤔")
     
 
 # --- Feedback Tab ---

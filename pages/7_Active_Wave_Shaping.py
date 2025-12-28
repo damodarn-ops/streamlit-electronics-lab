@@ -42,7 +42,7 @@ mcq_questions = [
      "explanation":"The **capacitor** is the energy storage element. During one half-cycle, the diode is forward-biased, allowing the capacitor to charge to the peak input voltage (minus the clamping reference, if any). Since the capacitor is in series, this stored DC voltage is then added to (or subtracted from) the input AC signal, shifting the entire waveform up or down."
      },
     {
-     "question":("An active positive clipper circuit has a sine wave input with a peak of $10\text{V}$ and a reference voltage $V_{\text{ref}} = 4\text{V}$. What is the maximum positive voltage of the clipped output waveform?"),
+     "question":("An active positive clipper circuit has a sine wave input with a peak of $10 {V}$ and a reference voltage $V_{{ref}} = 4 {V}$. What is the maximum positive voltage of the clipped output waveform?"),
      "options": [
             " $0.7 {V}$",
    " $10 {V}$",
@@ -76,6 +76,46 @@ mcq_questions = [
       }
     ]
 
+mcq_questions1 = [
+    {
+     "question":"Clipping level in op-amp clipper is decided by:",
+     "options": [ "Load resistor", "Reference voltage", "Supply voltage", "Frequency" ],
+     "correct_option_index": 1,
+     "explanation":"External reference voltage sets the threshold at which clipping occurs."
+     
+     
+     },
+    {
+     "question":"Double ended precision clipper:",
+     "options": ["Clips one side", "Shifts signal", "Clips both sides", "Rectifies waveform"],
+     "correct_option_index": 2,
+     "explanation":"A double ended clipper limits both positive and negative portions of the waveform."
+     
+     },
+    {
+     "question":"A biased clipper means:",
+     "options": [ "Clip at non-zero level", "Clip at zero", "Clip at peak", "No clipping" ],
+     "correct_option_index": 0,
+     "explanation":"Bias sets clipping level at a value other than zero volts."
+     },
+    {
+     "question":"For proper clamping, RC should be:",
+     "options": [ "RC << T", "RC = T", "RC < T" , "RC >> T" ],
+     "correct_option_index": 3,
+     "explanation":"RC must be much larger than signal period to prevent discharge." 
+     },
+    {
+     "question":"If capacitor fails in clamper:",
+     "options": [ "No effect", "No clamping happens", "Amplifies", "Clips input" ],
+     "correct_option_index": 1,
+     "explanation":"Without capacitor, DC level cannot be stored, so no shifting happens."
+     }
+    ]
+
+
+
+
+
 # --- Prelab Tab ---
 with tab1:
     st.markdown("""
@@ -95,25 +135,39 @@ with tab2:
     st.text_input("Your Name",key="p1")
     user_answers = {}
     for i, mcq in enumerate(mcq_questions):
-       user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+       question_number = i + 1  # Calculates the question number starting from 1
+     # Display the question with the number prepended
+       question_prompt = f"**Question {question_number}**: {mcq['question']}"
+       
+       # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+       user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcqp_{i}")
 
-    if st.button("Submit Answers", key="submit_mcq"):
+    if st.button("Submit Answers", key="submit_mcq1"):
        st.subheader("Results")
+       # Initialize score variables
+       correct_count = 0
+       total_questions = len(mcq_questions)
+       
        all_correct = True
        for i, mcq in enumerate(mcq_questions):
            correct_answer = mcq["options"][mcq["correct_option_index"]]
            if user_answers[i] == correct_answer:
                st.success(f"**Question {i+1}: Correct!** ✅")
                st.markdown(f"**Explanation:** {mcq['explanation']}")
+               correct_count += 1  # Increment the score
            else:
                st.error(f"**Question {i+1}: Incorrect.** ❌")
                st.markdown(f"**Correct Answer:** {correct_answer}")
                st.markdown(f"**Explanation:** {mcq['explanation']}")
                all_correct = False
+       # Display the final score immediately after the per-question results
+       st.markdown("---")
+       st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+       st.markdown("---")
        
        if all_correct:
            st.balloons()
-           st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
+           st.info("You've answered all questions correctly! . 🎉")
        else:
            st.warning("Please review the theory and try again. 🤔")
 
@@ -126,8 +180,8 @@ with tab3:
     ### Clippers (Limiters)
     A **clipper** circuit removes or "clips" a portion of an input signal that is above or below a specific voltage level. The output signal's shape is different from the input, but its AC components remain.
 
-    * **Positive Clipper:** Limits the positive portion of the input signal. The output waveform is flat at the reference voltage for all input voltages greater than V_ref.
-    * **Negative Clipper:** Limits the negative portion of the input signal. The output waveform is flat at the reference voltage for all input voltages less than V_ref.
+    * **Positive Clipper:** Limits the positive portion of the input signal. The output waveform is flat at the reference voltage for all input voltages greater than $V_{ref}$.
+    * **Negative Clipper:** Limits the negative portion of the input signal. The output waveform is flat at the reference voltage for all input voltages less than $V_{ref}$.
 
     The clipping action is due to the non-linear behavior of a diode, which is either forward-biased or reverse-biased depending on the input voltage relative to the reference voltage.
 
@@ -205,15 +259,14 @@ with tab4:
 
         # Number input for Reference Voltage.
         V_ref = st.number_input(
-            "Reference Voltage (V_ref) (V)",
+            "Reference Voltage ($V_{ref}$) (V)",
             value=0.0,
             step=0.1,
             format="%.2f", # Format to 2 decimal places.
             key="V_ref_input_shaping"
         )
 
-        st.markdown("---") # Horizontal line for visual separation.
-        st.write("Developed by DAMODAR")
+      
 
     # --- Core Simulation Logic ---
     def generate_waveform(amp, freq, wave_type_val, num_cycles=3):
@@ -274,6 +327,7 @@ with tab4:
         y_input, t, amp_input_actual, total_duration, input_freq = generate_waveform(
             amp_input, actual_frequency, selected_wave_type_int
         )
+       
 
         # Define typical op-amp power supply limits (for clipping).
         clipping_limit = 15.0
@@ -282,6 +336,9 @@ with tab4:
         
         # Calculate input time period in seconds.
         input_time_s = 1 / input_freq if input_freq != 0 else 0
+        
+        input_time_s=input_time_s*1000
+        input_freq=input_freq/1000
 
         shaping_circuit_name = get_shaping_circuit_name(selected_shaping_type_int)
 
@@ -360,9 +417,11 @@ with tab4:
     ax1.set_ylim(-max_plot_amp_input, max_plot_amp_input)
          
     ax1.set_xlim(0, total_duration)
-    ax1.tick_params(axis='x', colors='white')
-    ax1.tick_params(axis='y', colors='white')
-    ax1.set_title("Ch 1: Input Signal", color='white', fontsize=10)
+    ax1.tick_params(axis='x', colors='black')
+    ax1.tick_params(axis='y', colors='black')
+    ax1.set_xlabel("Time (sec)")
+    ax1.set_ylabel("Voltage (V)")
+    ax1.set_title("Ch 1: Input Signal", color='black', fontsize=10)
     ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
     with plot_col1:    
@@ -382,9 +441,11 @@ with tab4:
     ax2.set_ylim(-max_plot_amp_output, max_plot_amp_output)
         
     ax2.set_xlim(0, total_duration)
-    ax2.tick_params(axis='x', colors='white')
-    ax2.tick_params(axis='y', colors='white')
-    ax2.set_title("Ch 2: Output Signal", color='white', fontsize=10)
+    ax2.tick_params(axis='x', colors='black')
+    ax2.tick_params(axis='y', colors='black')
+    ax2.set_xlabel("Time (sec)")
+    ax2.set_ylabel("Voltage (V)")
+    ax2.set_title("Ch 2: Output Signal", color='black', fontsize=10)
     ax2.text(0.02, 0.95, f'Output High: {output_high:.2f} V', transform=ax2.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
     ax2.text(0.02, 0.85, f'Output Low: {output_low:.2f} V', transform=ax2.transAxes,
@@ -393,7 +454,7 @@ with tab4:
         st.pyplot(fig2) # Display the Matplotlib figure in Streamlit.
 
         # Plotting for Combined View (Channel 1 & 2).
-    fig_combined, ax_combined = plt.subplots(figsize=(6, 3), dpi=100)
+    fig_combined, ax_combined = plt.subplots(figsize=(3, 2), dpi=100)
     ax_combined.plot(t, y_input, color='lime', label='Input (Ch 1)')
     ax_combined.plot(t, y_output, color='cyan', label='Output (Ch 2)')
     ax_combined.set_facecolor("black")
@@ -409,9 +470,11 @@ with tab4:
     ax_combined.set_ylim(-max_combined_amp, max_combined_amp)
         
     ax_combined.set_xlim(0, total_duration)
-    ax_combined.tick_params(axis='x', colors='white')
-    ax_combined.tick_params(axis='y', colors='white')
-    ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='white', fontsize=10)
+    ax_combined.tick_params(axis='x', colors='black')
+    ax_combined.tick_params(axis='y', colors='black')
+    ax_combined.set_xlabel("Time (sec)")
+    ax_combined.set_ylabel("Voltage (V)")
+    ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='black', fontsize=10)
     ax_combined.legend(loc='upper right', fontsize=8, facecolor='darkgray', edgecolor='white')
     with plot_col3:     
         st.pyplot(fig_combined) # Display the Matplotlib figure in Streamlit.
@@ -429,8 +492,8 @@ with tab4:
             "#": len(st.session_state.simulation_history_shaping) + 1,
             "Circuit Type": shaping_circuit_name,
             "Input Amp (V)": f"{amp_input:.2f}",
-            "Input Freq (Hz)": f"{input_freq:.1f}",
-            "Input Time Period (s)": f"{input_time_s:.3f}",
+            "Input Freq (KHz)": f"{input_freq:.3f}",
+            "Input Time Period (ms)": f"{input_time_s:.3f}",
             "Reference Voltage (V)": f"{V_ref_val:.2f}",
             "Output High (V)": f"{output_high:.2f}",
             "Output Low (V)": f"{output_low:.2f}"
@@ -451,22 +514,43 @@ with tab4:
 with tab5:
     st.header("Postlab")
     st.text_input("Your Name",key="p3")
-    st.subheader("Conclusion:")
-   
-    st.write(" Summarize your observations from the simulation for clippers and clampers.")
-    st.text_area("Your Answer ", height=100, key="postlab_q1")
-    st.write(" Explain the effect of changing the reference voltage on the output waveforms.")
-    st.text_area("Your Answer ", height=100, key="postlab_q2")
-    st.write(" Discuss the importance of the op-amp in active wave shaping circuits.")
-    st.text_area("Your Answer ", height=100, key="postlab_q3")
-    st.subheader("Conclusion:")
-    
-    st.write(" For a sinusoidal input with an amplitude of 3V and a V_ref of 1V, describe the resulting output waveforms for a **Positive Clipper** and a **Negative Clipper**.")
-    st.text_area("Your Answer ", height=100, key="postlab_q4")
-    st.write(" For the same input, describe the output waveforms for a **Positive Clamper** and a **Negative Clamper**.")
-    st.text_area("Your Answer ", height=100, key="postlab_q5")
-    st.write(" Explain a real-world application for a clipper circuit and a clamper circuit.")
-    st.text_area("Your Answer ", height=100, key="postlab_q6")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions1):
+        question_number = i + 1  # Calculates the question number starting from 1
+      # Display the question with the number prepended
+        question_prompt = f"**Question {question_number}**: {mcq['question']}"
+        
+        # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+        user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcq_{i}")
+
+    if st.button("Submit Answers", key="submit_mcq"):
+        st.subheader("Results")
+        # Initialize score variables
+        correct_count = 0
+        total_questions = len(mcq_questions1)
+        
+        all_correct = True
+        for i, mcq in enumerate(mcq_questions1):
+            correct_answer = mcq["options"][mcq["correct_option_index"]]
+            if user_answers[i] == correct_answer:
+                st.success(f"**Question {i+1}: Correct!** ✅")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                correct_count += 1  # Increment the score
+            else:
+                st.error(f"**Question {i+1}: Incorrect.** ❌")
+                st.markdown(f"**Correct Answer:** {correct_answer}")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                all_correct = False
+        # Display the final score immediately after the per-question results
+        st.markdown("---")
+        st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+        st.markdown("---")
+        
+        if all_correct:
+            st.balloons()
+            st.info("You've answered all questions correctly! . 🎉")
+        else:
+            st.warning("Please review the theory and try again. 🤔")
 
 # --- Feedback Tab ---
 with tab6:

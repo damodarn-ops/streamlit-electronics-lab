@@ -21,6 +21,44 @@ import streamlit as st
 
 import streamlit as st
 
+mcq_questions1 = [
+    {
+     "question":"In an ideal half-wave precision rectifier, what is the output when input is negative?",
+     "options": [ "Same as input", "Zero", "Maximum voltage", "Half of input"  ],
+     "correct_option_index": 1,
+     "explanation":"For negative input, diode becomes reverse-biased and output becomes zero."
+     },
+    {
+     "question":"Which factor limits the high-frequency performance of precision rectifier?",
+     "options": ["Input resistance", "Slew rate of op-amp", "Temperature", "Power rating"   ],
+     "correct_option_index": 1,
+     "explanation":"Finite slew rate limits the op-amp's ability to follow fast-changing signals"
+     
+     },
+    {
+     "question":"If $R_f$ = $R_i$ in a precision rectifier, what is the gain?",
+     "options": [ "1", "0.5", "2", "Infinity"  ],
+     "correct_option_index": 0,
+     "explanation":"Gain = $R_f$ / $R_i$ = 1, so output equals input (unity gain)."
+     },
+    {
+     "question":"How many diodes are required in a precision full-wave rectifier?",
+     "options": ["8", "4", "2", "1"   ],
+     "correct_option_index": 2,
+     "explanation":"Two diodes are typically used along with two op-amps for full-wave precision rectification." 
+     },
+    {
+     "question":"What happens when a 741 op-amp is used at high frequency?",
+     "options": [ "Output improves", "Output remains same", "Output gets distorted", "Circuit stops" ],
+     "correct_option_index": 2,
+     "explanation":"741 has limited bandwidth and slew rate, so high-frequency signal becomes distorted."
+     }
+    ]
+
+
+
+
+
 # --- Tab 1: Prelab ---
 with tab1:
      st.header("Objective")
@@ -41,9 +79,9 @@ with tab2:
     st.subheader("Quick Check: Test Your Knowledge")
 
     # Define the list of questions, options, and correct answers
-    mcq_list = [
+    mcq_questions = [
         {
-            "question": "1. What is the primary function of a precision rectifier?",
+            "question": "What is the primary function of a precision rectifier?",
             "options": [
                 " To rectify low-amplitude AC signals by using an op-amp to overcome the diode's forward voltage drop.",
                 " To amplify low-frequency signals without distortion.",
@@ -54,7 +92,7 @@ with tab2:
             "explanation":  "A. To rectify low-amplitude AC signals by using an op-amp to overcome the diode's forward voltage drop."
         },
         {
-            "question": "2. In a precision half-wave rectifier, the op-amp essentially places the diode inside the feedback loop. What is the benefit of this arrangement?",
+            "question": " In a precision half-wave rectifier, the op-amp essentially places the diode inside the feedback loop. What is the benefit of this arrangement?",
             "options": [
                 " It increases the output impedance of the circuit.",
                 " It makes the circuit insensitive to temperature changes.",
@@ -65,7 +103,7 @@ with tab2:
             "explanation":  "The op-amp's gain effectively eliminates the diode's forward voltage drop from the output signal."
         },
         {
-            "question": "3. Which of the following components is NOT typically found in a basic precision half-wave rectifier circuit?",
+            "question": " Which of the following components is NOT typically found in a basic precision half-wave rectifier circuit?",
             "options": [
                 " Op-amp",
                 " Diode",
@@ -76,7 +114,7 @@ with tab2:
             "explanation":  "Inductor"
         },
         {
-            "question": "4. For a precision full-wave rectifier, how does the circuit handle the negative half of the input sinusoidal signal?",
+            "question": "For a precision full-wave rectifier, how does the circuit handle the negative half of the input sinusoidal signal?",
             "options": [
                 " It simply blocks the negative half-cycle.",
                 " It inverts the negative half-cycle and adds it to the positive half-cycle.",
@@ -87,7 +125,7 @@ with tab2:
             "explanation":  "It inverts the negative half-cycle and adds it to the positive half-cycle."
         },
         {
-        "question": "5. An ideal op-amp used in a precision rectifier has what effect on the rectification threshold (the voltage required to 'turn on' the rectification)?",
+        "question": "An ideal op-amp used in a precision rectifier has what effect on the rectification threshold (the voltage required to 'turn on' the rectification)?",
         "options": [
             " It raises the threshold to the op-amp's supply voltage.",
             " It lowers the threshold to the diode's forward voltage ($V_D$).",
@@ -105,28 +143,43 @@ with tab2:
     st.subheader("Multiple Choice Questions (MCQ)")
     st.text_input("Your Name",key="p1")
     user_answers = {}
-    for i, mcq in enumerate(mcq_list):
-        user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+    for i, mcq in enumerate(mcq_questions):
+       question_number = i + 1  # Calculates the question number starting from 1
+     # Display the question with the number prepended
+       question_prompt = f"**Question {question_number}**: {mcq['question']}"
+       
+       # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+       user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcqp_{i}")
 
-    if st.button("Submit Answers", key="submit_mcq"):
-        st.subheader("Results")
-        all_correct = True
-        for i, mcq in enumerate(mcq_list):
-            correct_answer = mcq["options"][mcq["correct_option_index"]]
-            if user_answers[i] == correct_answer:
-                st.success(f"**Question {i+1}: Correct!** ✅")
-                st.markdown(f"**Explanation:** {mcq['explanation']}")
-            else:
-                st.error(f"**Question {i+1}: Incorrect.** ❌")
-                st.markdown(f"**Correct Answer:** {correct_answer}")
-                st.markdown(f"**Explanation:** {mcq['explanation']}")
-                all_correct = False
-        
-        if all_correct:
-            st.balloons()
-            st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
-        else:
-            st.warning("Please review the theory and try again. 🤔")
+    if st.button("Submit Answers", key="submit_mcq1"):
+       st.subheader("Results")
+       # Initialize score variables
+       correct_count = 0
+       total_questions = len(mcq_questions)
+       
+       all_correct = True
+       for i, mcq in enumerate(mcq_questions):
+           correct_answer = mcq["options"][mcq["correct_option_index"]]
+           if user_answers[i] == correct_answer:
+               st.success(f"**Question {i+1}: Correct!** ✅")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               correct_count += 1  # Increment the score
+           else:
+               st.error(f"**Question {i+1}: Incorrect.** ❌")
+               st.markdown(f"**Correct Answer:** {correct_answer}")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               all_correct = False
+       # Display the final score immediately after the per-question results
+       st.markdown("---")
+       st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+       st.markdown("---")
+       
+       if all_correct:
+           st.balloons()
+           st.info("You've answered all questions correctly! . 🎉")
+       else:
+           st.warning("Please review the theory and try again. 🤔")
+          
         
 # --- Tab 2: Theory ---
 with tab3:
@@ -204,8 +257,7 @@ with tab4:
         rectifier_type_map = {"Precision Half Wave Rectifier": 1, "Precision Full Wave Rectifier": 2}
         selected_rectifier_type_int = rectifier_type_map[rectifier_type]
 
-        st.markdown("---")
-        st.write("Developed by DAMODAR")
+       
 
     # --- Core Simulation Logic ---
     def generate_waveform(amp, freq, wave_type_val, num_cycles=3):
@@ -234,6 +286,9 @@ with tab4:
             y = amp * signal.square(2 * np.pi * freq * t)
         else:
             y = np.zeros_like(t)
+            
+            
+        
 
         return y, t, amp, total_duration, freq
 
@@ -278,7 +333,10 @@ with tab4:
             amplitude_display_text += ' (Clipped)'
         elif output_amplitude == 0 and amp_input !=0:
             amplitude_display_text += ' (No Output)'
-
+        
+        input_freq=input_freq/1000
+        output_freq=output_freq/1000
+        
         return y_input, y_output, t, amp_input_actual, total_duration, input_freq, input_time_ms, \
                output_amplitude, output_freq, output_time_ms, phase_diff_deg, rectifier_name, amplitude_display_text
 
@@ -308,9 +366,11 @@ with tab4:
     ax1.axvline(0, color='gray', linewidth=0.5)
     ax1.set_ylim(-amp_input * 1.5 if amp_input != 0 else -1, amp_input * 1.5 if amp_input != 0 else 1)
     ax1.set_xlim(0, total_duration)
-    ax1.tick_params(axis='x', colors='white')
-    ax1.tick_params(axis='y', colors='white')
+    ax1.tick_params(axis='x', colors='black')
+    ax1.tick_params(axis='y', colors='black')
     ax1.set_title("Ch 1: Input Signal", color='black', fontsize=10)
+    ax1.set_xlabel("Time (sec)")
+    ax1.set_ylabel("Voltage (V)")
     ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
                      fontsize=8, color='white', verticalalignment='top')
     with plot_col1: # Display fig1 in the first plot column    
@@ -324,15 +384,17 @@ with tab4:
     plot_ylim = max(output_amplitude * 1.2, 1.0)
     ax2.set_ylim(-plot_ylim, plot_ylim)
     ax2.set_xlim(0, total_duration)
-    ax2.tick_params(axis='x', colors='white')
-    ax2.tick_params(axis='y', colors='white')
+    ax2.tick_params(axis='x', colors='black')
+    ax2.tick_params(axis='y', colors='black')
     ax2.set_title("Ch 2: Output Signal", color='black', fontsize=10)
+    ax2.set_xlabel("Time (sec)")
+    ax2.set_ylabel("Voltage (V)")
     ax2.text(0.02, 0.95, output_amp_display_text, transform=ax2.transAxes,
                      fontsize=8, color='white', verticalalignment='top')
     with plot_col2: # Display fig2 in the second plot column     
          st.pyplot(fig2)
 
-    fig_combined, ax_combined = plt.subplots(figsize=(6, 3), dpi=100)
+    fig_combined, ax_combined = plt.subplots(figsize=(3, 2), dpi=100)
     ax_combined.plot(t, y_input, color='lime', label='Input (Ch 1)')
     ax_combined.plot(t, y_output, color='cyan', label='Output (Ch 2)')
     ax_combined.set_facecolor("black")
@@ -341,9 +403,11 @@ with tab4:
     max_combined_amp = max(amp_input * 1.5, plot_ylim)
     ax_combined.set_ylim(-max_combined_amp, max_combined_amp)
     ax_combined.set_xlim(0, total_duration)
-    ax_combined.tick_params(axis='x', colors='white')
-    ax_combined.tick_params(axis='y', colors='white')
+    ax_combined.tick_params(axis='x', colors='black')
+    ax_combined.tick_params(axis='y', colors='black')
     ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='black', fontsize=10)
+    ax_combined.set_xlabel("Time (sec)")
+    ax_combined.set_ylabel("Voltage (V)")
     ax_combined.legend(loc='upper right', fontsize=8, facecolor='darkgray', edgecolor='white')
     with plot_col3: # Display combined_fig in the third plot column     
          st.pyplot(fig_combined)
@@ -357,10 +421,10 @@ with tab4:
             "#": len(st.session_state.simulation_history_rectifier) + 1,
             "Precision Rectifier": rectifier_name,
             "Input Amp (V)": f"{amp_input:.2f}",
-            "Input Freq (Hz)": f"{input_freq:.1f}",
+            "Input Freq (KHz)": f"{input_freq:.1f}",
             "Input Time period (ms)": f"{input_time_ms:.3f}",
             "Output Amp (V)": f"{output_amplitude:.2f}",
-            "Output Freq (Hz)": f"{output_freq:.1f}",
+            "Output Freq (KHz)": f"{output_freq:.1f}",
             "Output Time period (ms)": f"{output_time_ms:.4f}",
             "Phase Diff (deg)": f"{phase_diff_deg:.1f}"
         }
@@ -379,25 +443,43 @@ with tab4:
 with tab5:
     st.header("Postlab: Analysis and Conclusion")
     st.text_input("Your Name",key="p3")
-    st.markdown("""
-    **Instructions:** Use the simulation results you logged to the table to answer the following questions.
-    """)
-    st.subheader("Question 1: Observations")
-    st.write("Describe the key differences you observed between the output of the precision half-wave rectifier and the precision full-wave rectifier.")
-    st.text_area("Your Answer for Q1", height=100, key="postlab_rectifier_q1")
-    
-    st.subheader("Question 2: Amplitude Analysis")
-    st.write("What happened to the output waveform's amplitude when the input signal's amplitude was changed?")
-    st.text_area("Your Answer for Q2", height=100, key="postlab_rectifier_q2")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions1):
+        question_number = i + 1  # Calculates the question number starting from 1
+      # Display the question with the number prepended
+        question_prompt = f"**Question {question_number}**: {mcq['question']}"
+        
+        # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+        user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcq_{i}")
 
-    st.subheader("Question 3: Frequency Analysis")
-    st.write("How did the output waveform's frequency change with respect to the input frequency for both rectifier types? Use the logged data in the simulation table to support your answer.")
-    st.text_area("Your Answer for Q3", height=100, key="postlab_rectifier_q3")
-    
-    st.subheader("Conclusion")
-    st.write("Based on your observations and the logged simulation data, write a brief conclusion about the operation of precision rectifiers.")
-    st.text_area("Your Conclusion", height=200, key="postlab_rectifier_conclusion")
-
+    if st.button("Submit Answers", key="submit_mcq"):
+        st.subheader("Results")
+        # Initialize score variables
+        correct_count = 0
+        total_questions = len(mcq_questions1)
+        
+        all_correct = True
+        for i, mcq in enumerate(mcq_questions1):
+            correct_answer = mcq["options"][mcq["correct_option_index"]]
+            if user_answers[i] == correct_answer:
+                st.success(f"**Question {i+1}: Correct!** ✅")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                correct_count += 1  # Increment the score
+            else:
+                st.error(f"**Question {i+1}: Incorrect.** ❌")
+                st.markdown(f"**Correct Answer:** {correct_answer}")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                all_correct = False
+        # Display the final score immediately after the per-question results
+        st.markdown("---")
+        st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+        st.markdown("---")
+        
+        if all_correct:
+            st.balloons()
+            st.info("You've answered all questions correctly! . 🎉")
+        else:
+            st.warning("Please review the theory and try again. 🤔")
 # --- Tab 5: Feedback ---
 with tab6:
     st.header("Feedback")

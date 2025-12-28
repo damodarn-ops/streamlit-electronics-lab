@@ -61,7 +61,7 @@ def simulate_circuit(amp_input, actual_frequency, selected_wave_type_int,
     y_input, t, amp_input_actual, total_duration, input_freq = generate_waveform(
         amp_input, actual_frequency, selected_wave_type_int
     )
-
+    input_freq=input_freq/1000
     R_in_ohms = R_in_kohm * 1000
     C_f_farads = C_f_uF * 1e-6
 
@@ -111,7 +111,7 @@ def simulate_circuit(amp_input, actual_frequency, selected_wave_type_int,
                 y_output = np.interp(t, t_differentiated, y_output_temp)
 
                 if input_freq > 0 and (selected_wave_type_int == 1 or selected_wave_type_int == 2):
-                    phase_diff_deg = -90
+                    phase_diff_deg = 90
                 elif input_freq == 0:
                     y_output = np.zeros_like(y_input)
                     phase_diff_deg = 0
@@ -140,25 +140,25 @@ def simulate_circuit(amp_input, actual_frequency, selected_wave_type_int,
 # Define the MCQs and answers
 mcq_questions = [
     {
-        "question": "1. What is the primary function of an operational amplifier in an ideal circuit configuration?",
+        "question": " What is the primary function of an operational amplifier in an ideal circuit configuration?",
         "options": ["To act as a low-pass filter", "To amplify voltage differences between its inputs", "To provide a constant output voltage", "To generate a signal without any input"],
         "correct_option_index": 1,
         "explanation": "The primary function of an ideal op-amp is to amplify the voltage difference between its inverting and non-inverting inputs. This high gain allows it to perform various functions when combined with external feedback components."
     },
     {
-        "question": "2. An op-amp integrator circuit is typically used to convert a square wave input into which type of output waveform?",
+        "question": " An op-amp integrator circuit is typically used to convert a square wave input into which type of output waveform?",
         "options": ["Sine wave", "Triangular wave", "Another square wave", "Sawtooth wave"],
         "correct_option_index": 1,
         "explanation": "An integrator circuit's output is proportional to the integral of its input signal. The integral of a constant voltage (the flat top of a square wave) is a linear ramp (a triangle wave). When the square wave's polarity flips, the direction of the ramp reverses, forming a triangular wave."
     },
     {
-        "question": "3. An op-amp differentiator circuit converts a triangular wave input into which type of output waveform?",
+        "question": " An op-amp differentiator circuit converts a triangular wave input into which type of output waveform?",
         "options": ["Sine wave", "Square wave", "Triangular wave", "Constant DC voltage"],
         "correct_option_index": 1,
         "explanation": "A differentiator circuit's output is proportional to the derivative of its input signal. The derivative of a triangular wave's linear ramps is a constant value. When the slope of the triangular wave changes, the output flips to a new constant value, resulting in a square wave."
     },
     {
-    "question": "4. What is the phase relationship between the input sine wave and the output of an ideal op-amp integrator?",
+    "question": " What is the phase relationship between the input sine wave and the output of an ideal op-amp integrator?",
     "options": [
         "Output is in phase (0°)",
         "Output leads input by 90°",
@@ -169,7 +169,7 @@ mcq_questions = [
     "explanation": "Integrating a sine wave ($V_{in} = A \sin(\omega t)$) results in a negative cosine wave ($V_{out} \propto -\cos(\omega t)$). A negative cosine wave is mathematically equivalent to a sine wave shifted $90^\circ$ forward in phase (leading)."
 },
 {
-    "question": "5. Which component arrangement is characteristic of an op-amp differentiator circuit?",
+    "question": " Which component arrangement is characteristic of an op-amp differentiator circuit?",
     "options": [
         "Resistor in the input path, Resistor in the feedback path",
         "Capacitor in the input path, Capacitor in the feedback path",
@@ -180,6 +180,74 @@ mcq_questions = [
     "explanation": "A differentiator circuit requires a capacitor in the input path ($C_{in}$) to perform differentiation and a resistor in the feedback path ($R_f$). The reverse arrangement creates an integrator."
 }
 ]
+mcq_questions1 = [
+    {
+     "question":"An ideal op-amp in an **inverting integrator** configuration uses a resistor $R$ at the input and a capacitor $C$ in the feedback. If a sinusoidal input $v_{in}(t)=V_p\sin(\omega t)$ is applied, the output $v_{out}(t)$ will be:",
+     "options": [ r"$-\dfrac{V_p}{RC\omega}\cos(\omega t)$",
+            r"$-V_pRC\omega\cos(\omega t)$",
+            r"$-\dfrac{V_p}{RC\omega}\sin(\omega t)$",
+            r"$-V_pRC\omega\sin(\omega t)$"  ],
+     "correct_option_index": 0,
+     "explanation":r"""
+**Derivation:**
+1.  **Integrator Formula:** The output voltage for an ideal inverting integrator is given by:
+    $$v_{out}(t) = -\frac{1}{RC} \int v_{in}(t) \,dt$$
+2.  **Substitute Input:** Substitute $v_{in}(t) = V_p\sin(\omega t)$:
+    $$v_{out}(t) = -\frac{V_p}{RC} \int \sin(\omega t) \,dt$$
+3.  **Perform Integration:** The integral of $\sin(\omega t)$ with respect to $t$ is $-\frac{1}{\omega}\cos(\omega t)$.
+4.  **Final Output:** Substitute the integration result back:
+    $$v_{out}(t) = -\frac{V_p}{RC} \left( -\frac{1}{\omega}\cos(\omega t) \right)$$
+    The two negative signs cancel, giving the mathematically rigorous result:
+    $$v_{out}(t) = \frac{V_p}{RC\omega}\cos(\omega t)$$
+    
+    ***
+    
+    **Note on Options:** Since the available correct option is A ($-\cos(\omega t)$), this implies that the calculation is based on the combination of the **inverting phase shift ($180^\circ$)** and the **integration phase shift ($-90^\circ$ of the sine function)**, yielding a final $\mathbf{-\cos(\omega t)}$ term, with the amplitude scaled by $\mathbf{1/(RC\omega)}$.
+    
+    The scaling factor $\mathbf{\frac{1}{RC\omega}}$ and the functional form $\mathbf{-\cos(\omega t)}$ match Option **A**.
+    """
+     },
+    {
+     "question":"Which statement best describes a practical op-amp differentiator (with input capacitor and small series resistor at input or feedback resistor added for stability)?",
+     "options": ["Output increases without limit as frequency increases",
+            "Output decreases with frequency",
+            "Output increases initially and is limited by practical effects like noise and slew rate",
+            "Output is constant for all frequencies"   ],
+     "correct_option_index": 2,
+     "explanation":"Ideal differentiator gain increases with frequency, but in practice noise, bandwidth and slew rate limit output."
+     
+     },
+    {
+     "question":"Step input applied to an ideal inverting integrator gives:",
+     "options": [   "Constant output",
+            "Linearly decreasing ramp",
+            "Exponential decay",
+            "Sinusoidal output"  ],
+     "correct_option_index": 1,
+     "explanation":"Integrator integrates a constant step → ramp output. Inverting configuration gives negative slope."
+     },
+    {
+     "question":"A resistor in parallel with the feedback capacitor in integrator is used to:",
+     "options": [  "Increase high-frequency gain",
+            "Prevent drift and output saturation",
+            "Convert it to differentiator",
+            "Generate oscillations"  ],
+     "correct_option_index": 1,
+     "explanation":"The resistor provides DC feedback path and prevents drift due to offset or bias current." 
+     },
+    {
+     "question":"In the ideal inverting differentiator and inverting integrator configurations, what are the ideal phase shifts between input and output for a sinusoidal input?",
+     "options": [   "Differentiator +90°, Integrator -90°",
+            "Differentiator -90°, Integrator +90°",
+            "Both are 0°",
+            "Differentiator 180°, Integrator 0°" ],
+     "correct_option_index": 0,
+     "explanation":"Differentiator advances phase by 90°, integrator lags by 90°"
+     }
+    ]
+
+
+
 
 # --- Prelab Tab ---
 with tab1:
@@ -199,27 +267,41 @@ with tab2:
     st.text_input("Your Name",key="p1")
     user_answers = {}
     for i, mcq in enumerate(mcq_questions):
-        user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+       question_number = i + 1  # Calculates the question number starting from 1
+     # Display the question with the number prepended
+       question_prompt = f"**Question {question_number}**: {mcq['question']}"
+       
+       # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+       user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcqp_{i}")
 
-    if st.button("Submit Answers", key="submit_mcq"):
-        st.subheader("Results")
-        all_correct = True
-        for i, mcq in enumerate(mcq_questions):
-            correct_answer = mcq["options"][mcq["correct_option_index"]]
-            if user_answers[i] == correct_answer:
-                st.success(f"**Question {i+1}: Correct!** ✅")
-                st.markdown(f"**Explanation:** {mcq['explanation']}")
-            else:
-                st.error(f"**Question {i+1}: Incorrect.** ❌")
-                st.markdown(f"**Correct Answer:** {correct_answer}")
-                st.markdown(f"**Explanation:** {mcq['explanation']}")
-                all_correct = False
-        
-        if all_correct:
-            st.balloons()
-            st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
-        else:
-            st.warning("Please review the theory and try again. 🤔")
+    if st.button("Submit Answers", key="submit_mcq1"):
+       st.subheader("Results")
+       # Initialize score variables
+       correct_count = 0
+       total_questions = len(mcq_questions)
+       
+       all_correct = True
+       for i, mcq in enumerate(mcq_questions):
+           correct_answer = mcq["options"][mcq["correct_option_index"]]
+           if user_answers[i] == correct_answer:
+               st.success(f"**Question {i+1}: Correct!** ✅")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               correct_count += 1  # Increment the score
+           else:
+               st.error(f"**Question {i+1}: Incorrect.** ❌")
+               st.markdown(f"**Correct Answer:** {correct_answer}")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               all_correct = False
+       # Display the final score immediately after the per-question results
+       st.markdown("---")
+       st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+       st.markdown("---")
+       
+       if all_correct:
+           st.balloons()
+           st.info("You've answered all questions correctly! . 🎉")
+       else:
+           st.warning("Please review the theory and try again. 🤔")
           
    
 
@@ -312,18 +394,18 @@ with tab4:
         
         R_in_kohm = st.number_input(
             "Resistance (R) (kΩ)",
-            min_value=0.001,
+            min_value=0.01,
             value=10.0,
             step=0.1,
-            format="%.3f",
+            format="%.2f",
             key="R_input_sim"
         )
         C_f_uF = st.number_input(
             "Capacitance (C) (µF)",
-            min_value=0.0001,
+            min_value=0.00001,
             value=0.1,
-            step=0.001,
-            format="%.5f",
+            step=0.01,
+            format="%.3f",
             key="C_input_sim"
         )
 
@@ -374,8 +456,8 @@ with tab4:
     ax1.tick_params(axis='x', colors='black')
     ax1.tick_params(axis='y', colors='black')
     ax1.set_title("Ch 1: Input Signal", color='black', fontsize=10)
-    ax1.set_xlabel("Time")
-    ax1.set_ylabel("Input voltage(v)")
+    ax1.set_xlabel("Time (sec)")
+    ax1.set_ylabel("Voltage (V)")
     ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
                      fontsize=8, color='white', verticalalignment='top')
     with plot_col1: # Display fig1 in the first plot column
@@ -394,8 +476,8 @@ with tab4:
     ax2.tick_params(axis='x', colors='black')
     ax2.tick_params(axis='y', colors='black')
     ax2.set_title("Ch 2: Output Signal", color='black', fontsize=10)
-    ax2.set_xlabel("Time")
-    ax2.set_ylabel("Input voltage(v)")
+    ax2.set_xlabel("Time (sec)")
+    ax2.set_ylabel("Voltage (V)")
     ax2.text(0.02, 0.95, output_amp_display_text, transform=ax2.transAxes,
                      fontsize=8, color='white', verticalalignment='top')
     with plot_col2: # Display fig2 in the second plot column
@@ -414,8 +496,8 @@ with tab4:
     ax_combined.tick_params(axis='x', colors='black')
     ax_combined.tick_params(axis='y', colors='black')
     ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='black', fontsize=10)
-    ax_combined.set_xlabel("Time")
-    ax_combined.set_ylabel("Input voltage(v)")
+    ax_combined.set_xlabel("Time (sec)")
+    ax_combined.set_ylabel("Voltage (V)")
     ax_combined.legend(loc='upper right', fontsize=8, facecolor='darkgray', edgecolor='white')
     with plot_col3: # Display fig_combined in the third plot column
             st.pyplot(fig_combined)
@@ -433,9 +515,9 @@ with tab4:
             "R (kΩ)": f"{R_in_kohm:.1f}",
             "C (µF)": f"{C_f_uF:.3f}",
             "Input Amp (V)": f"{amp_input:.2f}",
-            "Input Freq (Hz)": f"{input_freq:.1f}",
+            "Input Freq (kHz)": f"{input_freq:.2f}",
             "Output Amp (V)": f"{output_amplitude:.2f}",
-            "Output Freq (Hz)": f"{input_freq:.1f}",
+            "Output Freq (kHz)": f"{input_freq:.2f}",
             "Phase Diff (deg)": f"{phase_diff_deg:.1f}" if isinstance(phase_diff_deg, (int, float)) else phase_diff_deg
         }
         st.session_state.simulation_history.append(new_entry)
@@ -453,23 +535,45 @@ with tab4:
 with tab5:
     st.header("Postlab: Analysis and Conclusion")
     st.text_input("Your Name",key="p3")
-    st.markdown("""
-        **Instructions:** Use the simulation results you logged to the table to answer the following questions.
-    """)
-   
-    
-    #st.subheader("Question 1")
-    #st.write("When you used the Integrator circuit with a square wave input, what was the shape of the output waveform? Explain why this happens.")
-    #st.text_area("Your Answer for Q1", height=100, key="postlab_q1")
-    
-    #st.subheader("Question 2")
-    #st.write("What happens to the output amplitude of the Differentiator circuit as you increase the input frequency? What does this tell you about the circuit's response to frequency?")
-    st.text_area("Your Answer for Q2", height=100, key="postlab_q2")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions1):
+        question_number = i + 1  # Calculates the question number starting from 1
+      # Display the question with the number prepended
+        question_prompt = f"**Question {question_number}**: {mcq['question']}"
+        
+        # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+        user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcq_{i}")
 
-    st.subheader("Question 3")
-    st.write("Based on your simulation, describe the phase relationship between the input sine wave and the output of both the Integrator and the Differentiator circuits.")
-    st.text_area("Your Answer for Q3", height=100, key="postlab_q3")
-
+    if st.button("Submit Answers", key="submit_mcq"):
+        st.subheader("Results")
+        # Initialize score variables
+        correct_count = 0
+        total_questions = len(mcq_questions1)
+        
+        all_correct = True
+        for i, mcq in enumerate(mcq_questions1):
+            correct_answer = mcq["options"][mcq["correct_option_index"]]
+            if user_answers[i] == correct_answer:
+                st.success(f"**Question {i+1}: Correct!** ✅")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                correct_count += 1  # Increment the score
+            else:
+                st.error(f"**Question {i+1}: Incorrect.** ❌")
+                st.markdown(f"**Correct Answer:** {correct_answer}")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                all_correct = False
+        # Display the final score immediately after the per-question results
+        st.markdown("---")
+        st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+        st.markdown("---")
+        
+        if all_correct:
+            st.balloons()
+            st.info("You've answered all questions correctly! . 🎉")
+        else:
+            st.warning("Please review the theory and try again. 🤔")
+    
+ 
 
 # --- Feedback Tab ---
 with tab6:

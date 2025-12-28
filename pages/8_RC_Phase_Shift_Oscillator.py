@@ -80,6 +80,44 @@ mcq_questions = [
     ]
 
 
+mcq_questions1 = [
+    {
+     "question":"RC phase shift oscillator generates:",
+     "options": [ "Square wave", "Triangular wave", "Sine wave", "Sawtooth wave" ],
+     "correct_option_index": 2,
+     "explanation":"RC phase shift oscillator produces sinusoidal oscillations."
+     
+     
+     },
+    {
+     "question":"Total phase shift required for oscillation:",
+     "options": [ "90°", "180°", "360°", "270°"  ],
+     "correct_option_index": 2,
+     "explanation":"For sustained oscillations, total phase shift must be 0° or 360°."
+     
+     },
+    {
+     "question":"Phase shift provided by each RC section is about:",
+     "options": ["30°", "45°", "60°", "90°"  ],
+     "correct_option_index": 2,
+     "explanation":"Each RC network provides approximately 60° phase shift."
+     },
+    {
+     "question":"Minimum gain for oscillation is:",
+     "options": [ "10", "15", "45", "29" ],
+     "correct_option_index": 3,
+     "explanation":"Theoretical minimum gain is 29 due to RC attenuation." 
+     },
+    {
+     "question":"If gain is reduced below minimum:",
+     "options": [ "Frequency increases", "No oscillations", "Output becomes square", "Noise reduces"  ],
+     "correct_option_index": 1,
+     "explanation":"Oscillations stop if gain is insufficient."
+     }
+    ]
+
+
+
 
 # --- Prelab Tab ---
 
@@ -104,25 +142,39 @@ with tab2:
     st.text_input("Your Name",key="p1")
     user_answers = {}
     for i, mcq in enumerate(mcq_questions):
-       user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+       question_number = i + 1  # Calculates the question number starting from 1
+     # Display the question with the number prepended
+       question_prompt = f"**Question {question_number}**: {mcq['question']}"
+       
+       # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+       user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcqp_{i}")
 
-    if st.button("Submit Answers", key="submit_mcq"):
+    if st.button("Submit Answers", key="submit_mcq1"):
        st.subheader("Results")
+       # Initialize score variables
+       correct_count = 0
+       total_questions = len(mcq_questions)
+       
        all_correct = True
        for i, mcq in enumerate(mcq_questions):
            correct_answer = mcq["options"][mcq["correct_option_index"]]
            if user_answers[i] == correct_answer:
                st.success(f"**Question {i+1}: Correct!** ✅")
                st.markdown(f"**Explanation:** {mcq['explanation']}")
+               correct_count += 1  # Increment the score
            else:
                st.error(f"**Question {i+1}: Incorrect.** ❌")
                st.markdown(f"**Correct Answer:** {correct_answer}")
                st.markdown(f"**Explanation:** {mcq['explanation']}")
                all_correct = False
+       # Display the final score immediately after the per-question results
+       st.markdown("---")
+       st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+       st.markdown("---")
        
        if all_correct:
            st.balloons()
-           st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
+           st.info("You've answered all questions correctly! . 🎉")
        else:
            st.warning("Please review the theory and try again. 🤔")
 
@@ -145,6 +197,8 @@ with tab3:
 
     ### Frequency of Oscillation
     The oscillation frequency ($f_o$) is determined by the values of R and C in the RC network and is given by the formula:
+    
+        
     $$f_o = \frac{1}{2 \pi R C \sqrt{6}}$$
     
     The amplifier gain ($A_v$) required for sustained oscillation is:
@@ -154,7 +208,7 @@ with tab3:
 # --- Simulation Tab ---
 with tab4:
     # --- Layout with Columns ---
-    col1, col2 = st.columns([1, 2])
+    col1, col2, col3 = st.columns([1, 1, 2])
 
     with col1:
         st.header("Oscillator Parameters")
@@ -165,7 +219,7 @@ with tab4:
             min_value=0.001,
             value=10.0,
             step=0.1,
-            format="%.3f",
+            format="%.2f",
             key="R_input_oscillator"
         )
         
@@ -175,7 +229,7 @@ with tab4:
             min_value=0.0001,
             value=0.1,
             step=0.001,
-            format="%.5f",
+            format="%.3f",
             key="C_input_oscillator"
         )
         
@@ -189,8 +243,7 @@ with tab4:
             key="f_desired_input_oscillator"
         )
         
-        st.markdown("---")
-        st.write("Developed by DAMODAR")
+      
 
     # --- Core Simulation Logic ---
     def calculate_oscillation_parameters(R_kohm, C_uF, f_desired):
@@ -255,86 +308,154 @@ with tab4:
             "t_time": t,
             "total_duration": total_duration
         }
+    with col2:    
+            st.header("Calculated Values")
+    # 3. RUN THE CALCULATION (Crucial step - must be after inputs, but before outputs)
+            sim_results = calculate_oscillation_parameters(R_kohm, C_uF, f_desired)
+    # st.metric requires: label, value (formatted as a string if you want decimals)
+            st.metric(
+              label="Calculated Frequency (f)",
+              value=f"{sim_results['f_output']:.2f} Hz"
+             )
+    
+    # Additional helpful metrics
+            st.metric(
+              label="Required R (for Desired Freq)",
+              value=f"{sim_results['R_calculated_kohm_for_desired']:.2f} kΩ"
+             )
+          
 
     # --- CRO Display and Simulation Results ---
-    with col2:
+    with col3:
         st.header("Circuit Diagram")
         
         st.image("images/RCphaseshiftoscillator.png", caption="RC Phaseshift Oscillator Circuit", width='stretch')
         
-        st.subheader("CRO Display")
-        st.text_input("Your Name",key="p2")
-        sim_results = calculate_oscillation_parameters(R_kohm, C_uF, f_desired)
+    st.subheader("CRO Display")
+    st.text_input("Your Name",key="p2")
+    sim_results = calculate_oscillation_parameters(R_kohm, C_uF, f_desired)
 
         # Plotting for Output Signal (CH1)
-        fig1, ax1 = plt.subplots(figsize=(6, 3), dpi=100)
-        ax1.plot(sim_results["t_time"], sim_results["y_signal"], color='red')
-        ax1.set_title("Oscillator Output Signal")
-        ax1.set_xlabel("Time (s)")
-        ax1.set_ylabel("Amplitude (V)")
-        ax1.grid(True)
-        ax1.set_facecolor("black")
-        ax1.axhline(0, color='gray', linewidth=0.5)
-        ax1.axvline(0, color='gray', linewidth=0.5)
+    fig1, ax1 = plt.subplots(figsize=(6, 3), dpi=100)
+    ax1.plot(sim_results["t_time"], sim_results["y_signal"], color='red')
+    ax1.set_title("Oscillator Output Signal")
+    ax1.set_xlabel("Time (sec)")
+    ax1.set_ylabel("Amplitude (V)")
+    ax1.grid(True)
+    ax1.set_facecolor("black")
+    ax1.axhline(0, color='gray', linewidth=0.5)
+    ax1.axvline(0, color='gray', linewidth=0.5)
         
-        plot_ylim = sim_results["output_amplitude"] * 1.5 if sim_results["output_amplitude"] != 0 else 1.0
-        ax1.set_ylim(-plot_ylim, plot_ylim)
-        ax1.set_xlim(0, sim_results["total_duration"])
-        ax1.tick_params(axis='x', colors='white')
-        ax1.tick_params(axis='y', colors='white')
+    plot_ylim = sim_results["output_amplitude"] * 1.5 if sim_results["output_amplitude"] != 0 else 1.0
+    ax1.set_ylim(-plot_ylim, plot_ylim)
+    ax1.set_xlim(0, sim_results["total_duration"])
+    ax1.tick_params(axis='x', colors='black')
+    ax1.tick_params(axis='y', colors='black')
         
-        ax1.text(0.02, 0.95, f'Amp: {sim_results["output_amplitude"]:.2f} V', transform=ax1.transAxes,
+    ax1.text(0.02, 0.95, f'Amp: {sim_results["output_amplitude"]:.2f} V', transform=ax1.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
-        ax1.text(0.02, 0.85, f'Freq: {sim_results["f_output"]:.2f} Hz', transform=ax1.transAxes,
+    ax1.text(0.02, 0.85, f'Freq: {sim_results["f_output"]:.2f} Hz', transform=ax1.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
-        st.pyplot(fig1)
+    st.pyplot(fig1)
+
+    
+
+
 
     st.header("Simulation Results")
 
+# 1. Initialize session state
     if 'oscillator_history' not in st.session_state:
-            st.session_state.oscillator_history = []
+        st.session_state.oscillator_history = []
 
+# 2. Handle the "Log" Button Logic
     if st.button("Log Current Results to Table", key="log_button_oscillator"):
-            new_entry = {
-                "Input R (kΩ)": f"{sim_results['R_input_kohm']:.2f}",
-                "Input C (µF)": f"{sim_results['C_input_uF']:.2f}",
-                "Desired Freq (Hz)": f"{sim_results['f_desired']:.2f}",
-                "Output Amp (V)": f"{sim_results['output_amplitude']:.2f}",
-                "Time Period (s)": f"{sim_results['time_period_s']:.4f}",
-                "Output Freq (Hz)": f"{sim_results['f_output']:.2f}",
-                "Calc. R for F_des (kΩ)": f"{sim_results['R_calculated_kohm_for_desired']:.2f}",
-                "Amp R1 (kΩ)": f"{sim_results['R1_kohm_amp']:.2f}",
-                "Amp RF (kΩ)": f"{sim_results['RF_kohm_amp']:.2f}"
-            }
-            st.session_state.oscillator_history.append(new_entry)
+        new_entry = {
+        "Input R (kΩ)": f"{sim_results['R_input_kohm']:.2f}",
+        "Input C (µF)": f"{sim_results['C_input_uF']:.2f}",
+        "Desired Freq (Hz)": f"{sim_results['f_desired']:.2f}",
+        "Output Amp (V)": f"{sim_results['output_amplitude']:.2f}",
+        "Time Period (s)": f"{sim_results['time_period_s']:.4f}",
+        "Output Freq (Hz)": f"{sim_results['f_output']:.2f}",
+        "Calc. R for F_des (kΩ)": f"{sim_results['R_calculated_kohm_for_desired']:.2f}",
+        "R1 (kΩ)": f"{sim_results['R1_kohm_amp']:.2f}",
+        "RF (kΩ)": f"{sim_results['RF_kohm_amp']:.2f}"
+        }
+        st.session_state.oscillator_history.append(new_entry)
+        st.rerun()
 
+# 3. Handle the Table Display Logic
     if st.session_state.oscillator_history:
-            df_history = pd.DataFrame(st.session_state.oscillator_history)
-            st.dataframe(df_history, width='stretch')
+    # START building the string
+        markdown_table = (
+        "| **Input R (kΩ)** | **Input C (µF)** | **Desired Freq (Hz)** | **Output Amp (V)** | **Time Period (s)** | **Output Freq (Hz)** | **Calc. R for $F_{des}$ (kΩ)** | **$R_1$ (kΩ)** | **$R_F$ (kΩ)** |\n"
+        "| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n"
+        )
 
+    # LOOP to add rows to the string
+        for entry in st.session_state.oscillator_history:
+            row_str = (
+            f"| {entry['Input R (kΩ)']} "
+            f"| {entry['Input C (µF)']} "
+            f"| {entry['Desired Freq (Hz)']} "
+            f"| {entry['Output Amp (V)']} "
+            f"| {entry['Time Period (s)']} "
+            f"| {entry['Output Freq (Hz)']} "
+            f"| {entry['Calc. R for F_des (kΩ)']} "
+            f"| {entry['R1 (kΩ)']} "
+            f"| {entry['RF (kΩ)']} |\n"
+            )
+            markdown_table += row_str
+
+    # DISPLAY the final string (Ensure this is NOT indented under the 'for' loop)
+        st.markdown(markdown_table)
+
+# 4. Clear Table Logic
     if st.button("Clear Table History", key="clear_table_button_oscillator"):
-            st.session_state.oscillator_history = []
-            st.rerun()
+        st.session_state.oscillator_history = []
+        st.rerun()
 
 # --- Postlab Tab ---
 with tab5:
     st.header("Postlab")
     st.text_input("Your Name",key="p3")
-    st.subheader("Conclusion:")
-    st.write("Summarize your observations from the simulation, focusing on the relationship between R, C, and the output frequency.")
-    st.text_area("Your Answer ", height=100, key="postlab_q1")
-    st.write( "Explain how the calculated amplifier resistor values (R1 and RF) are related to the required gain.")
-    st.text_area("Your Answer ", height=100, key="postlab_q2")
-    st.write( "Discuss the limitations of this ideal simulation compared to a real-world circuit.")
-    st.text_area("Your Answer ", height=100, key="postlab_q3")
-    
-    st.subheader("Analysis:")
-    st.write("Using the formula, calculate the required R and C values for a 500 Hz oscillation.")
-    st.text_area("Your Answer ", height=100, key="postlab_q4")
-    st.write("If the input R is 10kΩ and C is 0.01µF, what is the output frequency?")
-    st.text_area("Your Answer ", height=100, key="postlab_q5")
-    st.write(" What are some advantages and disadvantages of using an RC phase shift oscillator?")
-    st.text_area("Your Answer ", height=100, key="postlab_q6")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions1):
+        question_number = i + 1  # Calculates the question number starting from 1
+      # Display the question with the number prepended
+        question_prompt = f"**Question {question_number}**: {mcq['question']}"
+        
+        # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+        user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcq_{i}")
+
+    if st.button("Submit Answers", key="submit_mcq"):
+        st.subheader("Results")
+        # Initialize score variables
+        correct_count = 0
+        total_questions = len(mcq_questions1)
+        
+        all_correct = True
+        for i, mcq in enumerate(mcq_questions1):
+            correct_answer = mcq["options"][mcq["correct_option_index"]]
+            if user_answers[i] == correct_answer:
+                st.success(f"**Question {i+1}: Correct!** ✅")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                correct_count += 1  # Increment the score
+            else:
+                st.error(f"**Question {i+1}: Incorrect.** ❌")
+                st.markdown(f"**Correct Answer:** {correct_answer}")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                all_correct = False
+        # Display the final score immediately after the per-question results
+        st.markdown("---")
+        st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+        st.markdown("---")
+        
+        if all_correct:
+            st.balloons()
+            st.info("You've answered all questions correctly! . 🎉")
+        else:
+            st.warning("Please review the theory and try again. 🤔")
 
 # --- Feedback Tab ---
 with tab6:

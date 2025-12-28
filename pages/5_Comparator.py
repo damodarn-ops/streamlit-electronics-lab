@@ -80,7 +80,42 @@ mcq_questions = [
      }
      
   ]
+mcq_questions1 = [
+    {
+     "question":"A comparator using an op-amp works mainly in which mode?",
+     "options": [ "Linear region", "Cut-off region", "Saturation region", "Breakdown region"  ],
+     "correct_option_index": 2,
+     "explanation":"Comparator forces the op-amp to operate in saturation region."
      
+     
+     },
+    {
+     "question":"Reference voltage in comparator is:",
+     "options": [ "Power supply", "Ground", "Input signal", "Fixed comparison voltage"  ],
+     "correct_option_index": 3,
+     "explanation":"Reference sets the threshold level."
+     
+     },
+    {
+     "question":"In an inverting comparator, output is HIGH when:",
+     "options": ["Input > reference", "Input < reference", "Input = reference", "Always HIGH"   ],
+     "correct_option_index": 1,
+     "explanation":"Output becomes HIGH when input is lower than reference."
+     },
+    {
+     "question":"Which parameter affects comparator switching speed most?",
+     "options": [ "Input impedance", "Slew rate", "Gain", "Offset voltage"  ],
+     "correct_option_index": 1,
+     "explanation":"Slew rate decides output transition speed." 
+     },
+    {
+     "question":"Comparator output is:",
+     "options": ["Digital", "Analog",  "Sinusoidal", "Noise"   ],
+     "correct_option_index": 0,
+     "explanation":"Output is logic HIGH or LOW."
+     }
+    ]
+   
      
      
 # --- Prelab Tab ---
@@ -108,28 +143,41 @@ with tab2:
     st.text_input("Your Name",key="p1")
     user_answers = {}
     for i, mcq in enumerate(mcq_questions):
-        user_answers[i] = st.radio(mcq["question"], mcq["options"], key=f"mcq_{i}")
+       question_number = i + 1  # Calculates the question number starting from 1
+     # Display the question with the number prepended
+       question_prompt = f"**Question {question_number}**: {mcq['question']}"
+       
+       # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+       user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcqp_{i}")
 
-    if st.button("Submit Answers", key="submit_mcq"):
-        st.subheader("Results")
-        all_correct = True
-        for i, mcq in enumerate(mcq_questions):
-            correct_answer = mcq["options"][mcq["correct_option_index"]]
-            if user_answers[i] == correct_answer:
-                st.success(f"**Question {i+1}: Correct!** ✅")
-                st.markdown(f"**Explanation:** {mcq['explanation']}")
-            else:
-                st.error(f"**Question {i+1}: Incorrect.** ❌")
-                st.markdown(f"**Correct Answer:** {correct_answer}")
-                st.markdown(f"**Explanation:** {mcq['explanation']}")
-                all_correct = False
-        
-        if all_correct:
-            st.balloons()
-            st.info("You've answered all questions correctly! You are ready to proceed to the simulation. 🎉")
-        else:
-            st.warning("Please review the theory and try again. 🤔")
-
+    if st.button("Submit Answers", key="submit_mcq1"):
+       st.subheader("Results")
+       # Initialize score variables
+       correct_count = 0
+       total_questions = len(mcq_questions)
+       
+       all_correct = True
+       for i, mcq in enumerate(mcq_questions):
+           correct_answer = mcq["options"][mcq["correct_option_index"]]
+           if user_answers[i] == correct_answer:
+               st.success(f"**Question {i+1}: Correct!** ✅")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               correct_count += 1  # Increment the score
+           else:
+               st.error(f"**Question {i+1}: Incorrect.** ❌")
+               st.markdown(f"**Correct Answer:** {correct_answer}")
+               st.markdown(f"**Explanation:** {mcq['explanation']}")
+               all_correct = False
+       # Display the final score immediately after the per-question results
+       st.markdown("---")
+       st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+       st.markdown("---")
+       
+       if all_correct:
+           st.balloons()
+           st.info("You've answered all questions correctly! . 🎉")
+       else:
+           st.warning("Please review the theory and try again. 🤔")
 
 
 
@@ -222,8 +270,7 @@ with tab4:
             key="V_ref_input"
         )
 
-        st.markdown("---") # Horizontal line for visual separation.
-        st.write("Developed by DAMODAR")
+        
 
 
     # --- Core Simulation Logic ---
@@ -315,6 +362,10 @@ with tab4:
         # For a comparator, the output high and low values are the saturation voltages.
         output_high = V_sat_plus
         output_low = V_sat_minus
+        input_freq=input_freq/1000
+        input_time_s=input_time_s*1000
+
+
 
         return y_input, y_output, t, amp_input_actual, total_duration, input_freq, input_time_s, \
                  V_ref_val, output_high, output_low, comparator_name
@@ -358,8 +409,10 @@ with tab4:
     ax1.set_ylim(-max_plot_amp, max_plot_amp)
         
     ax1.set_xlim(0, total_duration)
-    ax1.tick_params(axis='x', colors='white')
-    ax1.tick_params(axis='y', colors='white')
+    ax1.tick_params(axis='x', colors='black')
+    ax1.tick_params(axis='y', colors='black')
+    ax1.set_xlabel("Time (sec)")
+    ax1.set_ylabel("Voltage (V)")
     ax1.set_title("Ch 1: Input Signal", color='black', fontsize=10)
     ax1.text(0.02, 0.95, f'Amp: {amp_input:.2f} V', transform=ax1.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
@@ -377,8 +430,10 @@ with tab4:
     ax2.set_ylim(output_low * 1.2, output_high * 1.2)
         
     ax2.set_xlim(0, total_duration)
-    ax2.tick_params(axis='x', colors='white')
-    ax2.tick_params(axis='y', colors='white')
+    ax2.tick_params(axis='x', colors='black')
+    ax2.tick_params(axis='y', colors='black')
+    ax2.set_xlabel("Time (sec)")
+    ax2.set_ylabel("Voltage (V)")
     ax2.set_title("Ch 2: Output Signal", color='black', fontsize=10)
     ax2.text(0.02, 0.95, f'Output High: {output_high:.2f} V', transform=ax2.transAxes,
                   fontsize=8, color='white', verticalalignment='top')
@@ -388,7 +443,7 @@ with tab4:
                    st.pyplot(fig2) # Display the Matplotlib figure in Streamlit.
 
         # Plotting for Combined View (Channel 1 & 2).
-    fig_combined, ax_combined = plt.subplots(figsize=(6, 3), dpi=100)
+    fig_combined, ax_combined = plt.subplots(figsize=(3, 2), dpi=100)
     ax_combined.plot(t, y_input, color='lime', label='Input (Ch 1)')
     ax_combined.plot(t, y_output, color='cyan', label='Output (Ch 2)')
     ax_combined.set_facecolor("black")
@@ -404,8 +459,10 @@ with tab4:
     ax_combined.set_ylim(-max_combined_amp, max_combined_amp)
         
     ax_combined.set_xlim(0, total_duration)
-    ax_combined.tick_params(axis='x', colors='white')
-    ax_combined.tick_params(axis='y', colors='white')
+    ax_combined.tick_params(axis='x', colors='black')
+    ax_combined.tick_params(axis='y', colors='black')
+    ax_combined.set_xlabel("Time (sec)")
+    ax_combined.set_ylabel("Voltage (V)")
     ax_combined.set_title("Combined View (Ch 1 & Ch 2)", color='black', fontsize=10)
     ax_combined.legend(loc='upper right', fontsize=8, facecolor='darkgray', edgecolor='white')
     with plot_col3: # Display fig1 in the first plot column  
@@ -424,8 +481,8 @@ with tab4:
             "#": len(st.session_state.simulation_history_comparator) + 1,
             "Comparator Type": comparator_name,
             "Input Amp (V)": f"{amp_input:.2f}",
-            "Input Freq (Hz)": f"{input_freq:.1f}",
-            "Input Time Period (s)": f"{input_time_s:.3f}",
+            "Input Freq (KHz)": f"{input_freq:.2f}",
+            "Input Time Period (ms)": f"{input_time_s:.3f}",
             "Reference Voltage (V)": f"{V_ref_val:.2f}",
             "Output High (V)": f"{output_high:.2f}",
             "Output Low (V)": f"{output_low:.2f}"
@@ -446,24 +503,43 @@ with tab4:
 with tab5:
     st.header("Postlab")
     st.text_input("Your Name",key="p3")
-    st.markdown("""
-    **Conclusion:**
-    """)
-    st.write("Summarize your observations from the simulation.")
-    st.text_area("Your Answer", height=100, key="postlab_q1")
-    st.write("Explain how the output waveform changed based on the input signal and the reference voltage.")
-    st.text_area("Your Answer", height=100, key="postlab_q2")
-    st.write("Discuss the difference between the inverting and non-inverting comparator circuits.")
-    st.text_area("Your Answer", height=100, key="postlab_q3")
-    st.markdown("""
-    **Analysis:**
-    """)
-    st.write("For a sinusoidal input with an amplitude of 2V and V_ref = 1V, describe the resulting output waveform (high/low voltages, duty cycle).")
-    st.text_area("Your Answer", height=100, key="postlab_q4")
-    st.write("What happens to the output if the reference voltage is set to a value greater than the peak-to-peak voltage of the input signal?")
-    st.text_area("Your Answer", height=100, key="postlab_q5")
-    st.write("Explain a real-world application of a comparator circuit (e.g., zero-crossing detector, threshold detector).")
-    st.text_area("Your Answer", height=100, key="postlab_q6")
+    user_answers = {}
+    for i, mcq in enumerate(mcq_questions1):
+        question_number = i + 1  # Calculates the question number starting from 1
+      # Display the question with the number prepended
+        question_prompt = f"**Question {question_number}**: {mcq['question']}"
+        
+        # *** FIX HERE: Use question_prompt instead of mcq["question"] ***
+        user_answers[i] = st.radio(question_prompt, mcq["options"], key=f"mcq_{i}")
+
+    if st.button("Submit Answers", key="submit_mcq"):
+        st.subheader("Results")
+        # Initialize score variables
+        correct_count = 0
+        total_questions = len(mcq_questions1)
+        
+        all_correct = True
+        for i, mcq in enumerate(mcq_questions1):
+            correct_answer = mcq["options"][mcq["correct_option_index"]]
+            if user_answers[i] == correct_answer:
+                st.success(f"**Question {i+1}: Correct!** ✅")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                correct_count += 1  # Increment the score
+            else:
+                st.error(f"**Question {i+1}: Incorrect.** ❌")
+                st.markdown(f"**Correct Answer:** {correct_answer}")
+                st.markdown(f"**Explanation:** {mcq['explanation']}")
+                all_correct = False
+        # Display the final score immediately after the per-question results
+        st.markdown("---")
+        st.subheader(f"📊 Final Score: {correct_count} / {total_questions}")
+        st.markdown("---")
+        
+        if all_correct:
+            st.balloons()
+            st.info("You've answered all questions correctly! . 🎉")
+        else:
+            st.warning("Please review the theory and try again. 🤔")
 
 # --- Feedback Tab ---
 with tab6:
